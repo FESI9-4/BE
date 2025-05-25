@@ -20,9 +20,20 @@ spring:
     open-in-view: false
 
 server:
-  port: 0
+  port: 8080
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+springdoc:
+  api-docs:
+    path: /fanfal/api-docs
+    enabled: true       
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+    doc-expansion: none
+    display-request-duration: true
+  paths-to-match:
+    - /api/**
+  packages-to-scan:
+    - com.controller
