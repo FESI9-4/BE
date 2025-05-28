@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: idol
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/board
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+        generate_statistics: false
+    show-sql: true
+    open-in-view: false
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+cloud:
+  aws:
+    s3:
+      bucket: codit-project # 버킷 이름
+    stack.auto: false
+    region.static: ap-northeast-2 # 버킷 리전
+    credentials:
+      access-key: ${ACCESS_KEY}
+      secret-key: ${SECRET_KEY}
