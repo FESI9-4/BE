@@ -1,0 +1,42 @@
+package com.idol.board.controller.article.command;
+
+import com.idol.board.dto.request.article.ArticleCreateRequestDto;
+import com.idol.board.dto.request.article.ArticleUpdateRequestDto;
+import com.idol.board.usecase.article.command.CreateArticleUseCase;
+import com.idol.board.usecase.article.command.DeleteArticleUseCase;
+import com.idol.board.usecase.article.command.UpdateArticleUseCase;
+import com.idol.global.common.response.ApiResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/board")
+@RequiredArgsConstructor
+public class ArticleController {
+    private final CreateArticleUseCase createArticleUseCase;
+    private final DeleteArticleUseCase deleteArticleUseCase;
+    private final UpdateArticleUseCase updateArticleUserCase;
+
+    @PostMapping()
+    public ApiResponse<Long> createArticle(@RequestBody ArticleCreateRequestDto requestDto) {
+        Long writerId = 1312441414L;
+        Long articleId = createArticleUseCase.createArticle(requestDto, writerId);
+        return ApiResponse.ok(articleId, "게시글 작성 성공");
+    }
+
+
+    @DeleteMapping("/{articleId}")
+    public ApiResponse<Long> deleteArticle(@PathVariable("articleId") Long articleId) {
+        Long resultId = deleteArticleUseCase.delete(articleId);
+
+        return ApiResponse.ok(resultId, "게시물 삭제가 완료되었습니다.");
+    }
+
+
+    @PatchMapping("/{articleId}")
+    public ApiResponse<Long> updateArticle(@RequestBody ArticleUpdateRequestDto requestDto, @PathVariable Long articleId) {
+        Long writerId = 1312441414L; // TODO: 실제 인증된 사용자의 ID로 대체
+        Long updatedArticleId = updateArticleUserCase.updateArticle(requestDto, writerId, articleId);
+        return ApiResponse.ok(updatedArticleId, "게시글 수정 성공");
+    }
+}
