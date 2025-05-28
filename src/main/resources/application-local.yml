@@ -4,13 +4,13 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DB_URL}
+    url: jdbc:mysql://localhost:3306/board
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
@@ -19,35 +19,13 @@ spring:
     show-sql: true
     open-in-view: false
 
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
-
-jwt:
-   secret: ${JWT_SECRET}
-   expiration: 1800000 # 30분 (밀리초)
-   refresh-expiration: 1209600000 # 14일 (밀리초)
-
 server:
   port: 8080
 
-springdoc:
-  api-docs:
-    path: /fanfal/api-docs
-    enabled: true
-  swagger-ui:
-    path: /swagger-ui.html
-    enabled: true
-    tags-sorter: alpha
-    operations-sorter: alpha
-    doc-expansion: none
-    display-request-duration: true
-  paths-to-match:
-    - /api/**
-  packages-to-scan:
-    - com.idol
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
 
 cloud:
   aws:
@@ -58,4 +36,3 @@ cloud:
     credentials:
       access-key: ${ACCESS_KEY}
       secret-key: ${SECRET_KEY}
-
