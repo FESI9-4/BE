@@ -1,5 +1,6 @@
 package com.idol.global.exception.handler;
 
+import com.idol.global.exception.ArticleNotFoundException;
 import com.idol.global.exception.AuthenticationException;
 import com.idol.global.exception.BadRequestException;
 import com.idol.global.exception.ConflictException;
@@ -44,6 +45,13 @@ public class GlobalExceptionHandler {
 
         problemDetail.setTitle("인증 실패");
 
+        return problemDetail;
+    }
+
+    @ExceptionHandler(ArticleNotFoundException.class)
+    ProblemDetail handleArticleNotFoundException(final ArticleNotFoundException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+        problemDetail.setTitle("게시물을 찾을 수 없습니다");
         return problemDetail;
     }
 
