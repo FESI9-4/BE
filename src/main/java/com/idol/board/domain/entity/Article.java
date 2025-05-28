@@ -21,8 +21,11 @@ import java.util.Set;
 @Table(name = "article")
 @Getter
 @ToString
+@Builder
+@AllArgsConstructor
 // 생성자마다 builder 사용
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Where(clause = "is_deleted = false")
 public class Article extends BaseEntity {
     // 정적 Snowflake 인스턴스
     private static final Snowflake snowflake = new Snowflake();
