@@ -63,6 +63,9 @@ dependencies {
 
     // === Log ===
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '3.3.3'
+
+    // === AWS S3 ===
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 }
 
 tasks.named('test') {
