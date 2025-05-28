@@ -1,5 +1,6 @@
 package com.idol.global.exception.handler;
 
+import com.idol.global.exception.ArticleNotFoundException;
 import com.idol.global.exception.BadRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,13 @@ public class GlobalExceptionHandler {
         // 아래와 같이 필드 확장 가능
         problemDetail.setTitle("잘못된 요청입니다");
 
+        return problemDetail;
+    }
+
+    @ExceptionHandler(ArticleNotFoundException.class)
+    ProblemDetail handleArticleNotFoundException(final ArticleNotFoundException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+        problemDetail.setTitle("게시물을 찾을 수 없습니다");
         return problemDetail;
     }
 
