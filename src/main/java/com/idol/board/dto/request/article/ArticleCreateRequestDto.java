@@ -5,6 +5,7 @@ import com.idol.board.domain.OpenStatus;
 import com.idol.board.domain.SmallCategory;
 import com.idol.board.domain.UseStatus;
 import com.idol.board.domain.entity.Article;
+import com.idol.board.domain.entity.Location;
 
 import java.sql.Timestamp;
 import java.util.Set;
