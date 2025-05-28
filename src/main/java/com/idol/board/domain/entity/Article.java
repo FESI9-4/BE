@@ -10,6 +10,8 @@ import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.*;
 import org.hibernate.annotations.*;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Where;
 
 import java.sql.Timestamp;
 import java.util.Set;
@@ -18,8 +20,11 @@ import java.util.Set;
 @Table(name = "article")
 @Getter
 @ToString
+@Builder
+@AllArgsConstructor
 // 생성자마다 builder 사용
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Where(clause = "is_deleted = false")
 public class Article extends BaseEntity {
 
     @Id
@@ -29,6 +34,7 @@ public class Article extends BaseEntity {
     private Long articleId;
 
     // TODO :: Member Table과 매핑
+    // Todo :: writerId가 있는데 굳이 userId도 필요한가?
 //    @Column(name = "user_id", nullable = false)
 //    private Long userId;
 
