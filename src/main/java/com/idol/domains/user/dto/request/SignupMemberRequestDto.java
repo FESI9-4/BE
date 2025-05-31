@@ -11,7 +11,7 @@ import lombok.Builder;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Builder
-public record SignupUserRequestDto(
+public record SignupMemberRequestDto(
         @Schema(description = "이메일", example = "user@example.com")
         @NotBlank(message = "이메일은 필수 값입니다.")
         @Email(message = "올바른 이메일 형식이 아닙니다.")

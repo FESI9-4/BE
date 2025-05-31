@@ -40,11 +40,11 @@ dependencies {
     // === Web ===
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
+    // === Security ===
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
     // === Validation ===
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-    // === API Documentation ===
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
 
     // === API Documentation ===
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'

@@ -1,6 +1,6 @@
 package com.idol.domains.user.domain;
 
-import com.idol.domains.user.dto.request.SignupUserRequestDto;
+import com.idol.domains.user.dto.request.SignupMemberRequestDto;
 import com.idol.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -13,13 +13,13 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "user")
-public class User extends BaseEntity {
+@Table(name = "member")
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, columnDefinition = "BINARY(16)")
-    private UUID id;
+    private UUID memberId;
 
     @Column(name = "email", nullable = false)
     private String email;
@@ -33,16 +33,16 @@ public class User extends BaseEntity {
     @Column(name = "profile_img_url", nullable = false)
     private String profileImgUrl;
 
-    public static User from(SignupUserRequestDto requestDto) {
-        return User.builder()
+    public static Member from(SignupMemberRequestDto requestDto, String encryptedPassword) {
+        return Member.builder()
                 .email(requestDto.email())
-                .password(requestDto.password())
+                .password(encryptedPassword)
                 .nickname(requestDto.nickname())
                 .build();
     }
 
     @Builder
-    private User(String email, String password, String nickname) {
+    private Member(String email, String password, String nickname) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;

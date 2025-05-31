@@ -36,4 +36,4 @@ springdoc:
   paths-to-match:
     - /api/**
   packages-to-scan:
-    - com.controller
+    - com.idol
