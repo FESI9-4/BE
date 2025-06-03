@@ -20,8 +20,6 @@ import java.util.Set;
 @Table(name = "article")
 @Getter
 @ToString
-@Builder
-@AllArgsConstructor
 // 생성자마다 builder 사용
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Where(clause = "is_deleted = false")
