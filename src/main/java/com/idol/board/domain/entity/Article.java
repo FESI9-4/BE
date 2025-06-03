@@ -9,9 +9,12 @@ import com.idol.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "article")
@@ -21,6 +24,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Where(clause = "is_deleted = false")
+@SQLDelete(sql = "UPDATE article SET is_deleted = true WHERE article_id = ?")  // 삭제 시 상태값 변경
 public class Article extends BaseEntity {
 
     @Id
@@ -40,9 +44,12 @@ public class Article extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "location_id", unique = true) // 외래키, UNIQUE로 1:1 보장
     private Location location;
+
+//    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Comment> comments = new ArrayList<>();
 
     @Column(name = "big_category", nullable = false)
     private BigCategory bigCategory;
@@ -87,4 +94,5 @@ public class Article extends BaseEntity {
         if (requestDto.maxPerson() != null) this.maxPerson = requestDto.maxPerson();
         if (requestDto.imageKey() != null) this.articleImageKey = requestDto.imageKey();
     }
+
 }
