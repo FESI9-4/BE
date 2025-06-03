@@ -1,9 +1,8 @@
 package com.idol.board.repository.article;
 
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import com.idol.board.domain.entity.Article;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public interface ArticleRepository {
+public interface ArticleRepository extends JpaRepository<Article, Long>,ArticleRepositoryCustom {
 
 }
