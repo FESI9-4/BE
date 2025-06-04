@@ -2,6 +2,7 @@ package com.idol.global.exception.handler;
 
 import com.idol.global.exception.ArticleNotFoundException;
 import com.idol.global.exception.BadRequestException;
+import com.idol.global.exception.CommentNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -30,6 +31,13 @@ public class GlobalExceptionHandler {
     ProblemDetail handleArticleNotFoundException(final ArticleNotFoundException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
         problemDetail.setTitle("게시물을 찾을 수 없습니다");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(CommentNotFoundException.class)
+    ProblemDetail handleArticleNotFoundException(final CommentNotFoundException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+        problemDetail.setTitle("댓글을 찾을 수 없습니다");
         return problemDetail;
     }
 
