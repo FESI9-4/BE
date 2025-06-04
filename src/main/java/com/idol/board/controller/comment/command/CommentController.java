@@ -27,7 +27,7 @@ public class CommentController {
         // TODO :: UserId 연동
         Long writerId = 12341L;
         Long commentId = createCommentUseCase.createComment(requestDto, writerId, articleId);
-        
+
         return ApiResponse.ok(commentId, "댓글 생성 성공");
     }
 
