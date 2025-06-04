@@ -27,6 +27,8 @@ public class ImagePostService implements ImageUploadUseCase {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+
+    // 이미지 S3 업로드
     @Transactional(readOnly = true)
     public GetS3UrlDto getPostS3Url(Long memberId, String filename) {
         // filename 설정하기(profile 경로 + 멤버ID + 랜덤 값)

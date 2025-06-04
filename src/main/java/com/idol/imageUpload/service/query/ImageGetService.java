@@ -26,6 +26,7 @@ public class ImageGetService implements ImageGetUserCase {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    // S3 이미지 호출
     @Override
     @Transactional(readOnly = true)
     public GetS3UrlDto getGetS3Url(String key) {
