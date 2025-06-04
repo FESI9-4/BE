@@ -3,7 +3,7 @@ package com.idol.board.service.article.command;
 import com.idol.board.domain.entity.Article;
 import com.idol.board.domain.entity.Location;
 import com.idol.board.dto.request.article.ArticleUpdateRequestDto;
-import com.idol.board.repository.article.ArticleJpaRepository;
+import com.idol.board.repository.article.ArticleRepository;
 import com.idol.board.usecase.article.command.UpdateArticleUseCase;
 import com.idol.global.exception.ArticleNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UpdateArticleService implements UpdateArticleUseCase {
 
-    private final ArticleJpaRepository articleJpaRepository;
+    private final ArticleRepository articleJpaRepository;
 
     @Override
     @Transactional
