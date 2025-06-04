@@ -3,8 +3,8 @@ package com.idol.board.service.comment.command;
 import com.idol.board.domain.entity.Article;
 import com.idol.board.domain.entity.Comment;
 import com.idol.board.dto.request.comment.CommentCreateRequestDto;
-import com.idol.board.repository.article.ArticleJpaRepository;
-import com.idol.board.repository.comment.CommentJpaRepository;
+import com.idol.board.repository.article.ArticleRepository;
+import com.idol.board.repository.comment.CommentRepository;
 import com.idol.board.usecase.comment.command.CreateCommentUseCase;
 import com.idol.global.common.snowflake.Snowflake;
 import com.idol.global.exception.ArticleNotFoundException;
@@ -12,13 +12,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static java.util.function.Predicate.not;
-
 @Service
 @RequiredArgsConstructor
 public class CreateCommentService implements CreateCommentUseCase {
-    private final ArticleJpaRepository articleJpaRepository;
-    private final CommentJpaRepository commentJpaRepository;
+    private final ArticleRepository articleJpaRepository;
+    private final CommentRepository commentJpaRepository;
     private final Snowflake snowflake = new Snowflake();        // 대댓글 판단을 위해 service에서 사용
 
     @Override
@@ -30,16 +28,27 @@ public class CreateCommentService implements CreateCommentUseCase {
         // Comment(부모 객체) 값이 반환되었다면 대댓글, NUll 반환되었다면 부모 객체
         Comment parent = findParent(requestDto);
 
-        Long commentId = commentJpaRepository.save(
+        Comment comment = commentJpaRepository.save(
                 requestDto.toEntity(
                         snowflake.nextId(),
                         article,
                         writerId,
                         parent == null ? null : parent.getCommentId()
-                )
-        ).getCommentId();
+                ));
 
-        return commentId;
+//        Comment comment = Comment.builder()
+//                .commentId(snowflake.nextId())
+//                .article(article)
+//                .writerId(writerId)
+//                .content(requestDto.content())
+//                .parentCommentId(parent == null ? null : parent.getCommentId())
+//                .secret(requestDto.secret())
+//                .build();
+
+        // 연관관계 편의 메서드
+//        article.addComment(comment);
+
+        return comment.getCommentId();
     }
 
 
