@@ -2,7 +2,7 @@ package com.idol.board.service.article.command;
 
 import com.idol.board.domain.entity.Article;
 import com.idol.board.dto.request.article.ArticleCreateRequestDto;
-import com.idol.board.repository.article.ArticleJpaRepository;
+import com.idol.board.repository.article.ArticleRepository;
 import com.idol.board.usecase.article.command.CreateArticleUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CreateArticleService implements CreateArticleUseCase {
 
-    private final ArticleJpaRepository articleJpaRepository;
+    private final ArticleRepository articleJpaRepository;
 
     @Override
     @Transactional
