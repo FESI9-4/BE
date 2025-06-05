@@ -16,11 +16,11 @@ public class S3Controller {
     private final ImageGetUserCase imageGetUserCase;
 
     // S3 이미지 파일 업로드할 URL 값 전송
-    @PostMapping( "/postImage")
+    @GetMapping( "/postImage")
     // TODO :: User값 매개변수 추가 예정
-    public ApiResponse<GetS3UrlDto> getPostS3Url(PostS3UrlDto request) {
+    public ApiResponse<GetS3UrlDto> getPostS3Url(String fileName) {
         Long userId = 1321414L;
-        GetS3UrlDto getS3UrlDto = imageUploadUseCase.getPostS3Url(userId, request.fileName());
+        GetS3UrlDto getS3UrlDto = imageUploadUseCase.getPostS3Url(userId, fileName);
         return ApiResponse.ok(getS3UrlDto, "이미지 주소 저장 성공");
     }
 

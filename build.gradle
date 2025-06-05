@@ -7,6 +7,10 @@ plugins {
 group = 'com'
 version = '0.0.1-SNAPSHOT'
 
+ext {
+    springCloudAwsVersion = '2.2.6.RELEASE'
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
@@ -62,8 +66,10 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
 
     // === AWS S3 ===
-    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    implementation "org.springframework.cloud:spring-cloud-starter-aws:${springCloudAwsVersion}"
 }
+
+
 
 tasks.named('test') {
     useJUnitPlatform()
