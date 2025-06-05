@@ -8,9 +8,11 @@ import com.idol.domains.user.usecase.SignupMemberUseCase;
 import com.idol.global.util.PasswordEncryptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class SignupMemberService implements SignupMemberUseCase {
 
     private final MemberRepository memberRepository;
