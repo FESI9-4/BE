@@ -1,24 +1,12 @@
 package com.idol.domains.user.repository;
 
 import com.idol.domains.user.domain.Member;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 
-@RequiredArgsConstructor
-@Repository
-public class MemberRepository {
+public interface MemberRepository {
 
-    private final MemberJpaRepository memberJpaRepository;
+    Member save(Member member);
 
-    public Member save(Member member) {
-        return memberJpaRepository.save(member);
-    }
+    boolean existsByMemberEmail(String email);
 
-    public boolean existsByMemberEmail(String email) {
-        return memberJpaRepository.existsByEmail(email);
-    }
-
-    public boolean existsByNickname(String nickname) {
-        return memberJpaRepository.existsByNickname(nickname);
-    }
+    boolean existsByNickname(String nickname);
 }

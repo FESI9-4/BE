@@ -12,11 +12,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @DataJpaTest
-@Import(MemberRepository.class)
+@Import(MemberRepositoryImpl.class)
 class MemberRepositoryTest {
 
     @Autowired
-    private MemberRepository memberRepository;
+    private MemberRepositoryImpl memberRepositoryImpl;
 
     @Autowired
     private MemberJpaRepository memberJpaRepository;
@@ -32,7 +32,7 @@ class MemberRepositoryTest {
                 .build();
 
         // when
-        Member savedMember = memberRepository.save(member);
+        Member savedMember = memberRepositoryImpl.save(member);
 
         // then
         assertThat(savedMember.getMemberId()).isNotNull();
@@ -51,7 +51,7 @@ class MemberRepositoryTest {
                 .password("password123!")
                 .nickname("테스트유저")
                 .build();
-        Member savedMember = memberRepository.save(member);
+        Member savedMember = memberRepositoryImpl.save(member);
 
         // when
         Member foundMember = memberJpaRepository.findById(savedMember.getMemberId())
@@ -71,11 +71,11 @@ class MemberRepositoryTest {
                 .password("password123!")
                 .nickname("테스트유저")
                 .build();
-        memberRepository.save(member);
+        memberRepositoryImpl.save(member);
 
         // when & then
-        assertThat(memberRepository.existsByMemberEmail("test@example.com")).isTrue();
-        assertThat(memberRepository.existsByMemberEmail("notexist@example.com")).isFalse();
+        assertThat(memberRepositoryImpl.existsByMemberEmail("test@example.com")).isTrue();
+        assertThat(memberRepositoryImpl.existsByMemberEmail("notexist@example.com")).isFalse();
     }
 
     @DisplayName("닉네임으로 회원 존재 여부를 확인할 수 있다.")
@@ -87,11 +87,11 @@ class MemberRepositoryTest {
                 .password("password123!")
                 .nickname("테스트유저")
                 .build();
-        memberRepository.save(member);
+        memberRepositoryImpl.save(member);
 
         // when & then
-        assertThat(memberRepository.existsByNickname("테스트유저")).isTrue();
-        assertThat(memberRepository.existsByNickname("존재하지않는닉네임")).isFalse();
+        assertThat(memberRepositoryImpl.existsByNickname("테스트유저")).isTrue();
+        assertThat(memberRepositoryImpl.existsByNickname("존재하지않는닉네임")).isFalse();
     }
 
     @DisplayName("여러 회원이 있을 때 특정 이메일 존재 여부를 정확히 확인할 수 있다.")
@@ -110,13 +110,13 @@ class MemberRepositoryTest {
                 .nickname("테스트유저2")
                 .build();
 
-        memberRepository.save(member1);
-        memberRepository.save(member2);
+        memberRepositoryImpl.save(member1);
+        memberRepositoryImpl.save(member2);
 
         // when & then
-        assertThat(memberRepository.existsByMemberEmail("test1@example.com")).isTrue();
-        assertThat(memberRepository.existsByMemberEmail("test2@example.com")).isTrue();
-        assertThat(memberRepository.existsByMemberEmail("test3@example.com")).isFalse();
+        assertThat(memberRepositoryImpl.existsByMemberEmail("test1@example.com")).isTrue();
+        assertThat(memberRepositoryImpl.existsByMemberEmail("test2@example.com")).isTrue();
+        assertThat(memberRepositoryImpl.existsByMemberEmail("test3@example.com")).isFalse();
     }
 
     @DisplayName("여러 회원이 있을 때 특정 닉네임 존재 여부를 정확히 확인할 수 있다.")
@@ -135,12 +135,12 @@ class MemberRepositoryTest {
                 .nickname("테스트유저2")
                 .build();
 
-        memberRepository.save(member1);
-        memberRepository.save(member2);
+        memberRepositoryImpl.save(member1);
+        memberRepositoryImpl.save(member2);
 
         // when & then
-        assertThat(memberRepository.existsByNickname("테스트유저1")).isTrue();
-        assertThat(memberRepository.existsByNickname("테스트유저2")).isTrue();
-        assertThat(memberRepository.existsByNickname("테스트유저3")).isFalse();
+        assertThat(memberRepositoryImpl.existsByNickname("테스트유저1")).isTrue();
+        assertThat(memberRepositoryImpl.existsByNickname("테스트유저2")).isTrue();
+        assertThat(memberRepositoryImpl.existsByNickname("테스트유저3")).isFalse();
     }
 }
