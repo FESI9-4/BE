@@ -12,7 +12,6 @@ import org.hibernate.annotations.Where;
 @Entity
 @Table(name = "comment")
 @Getter
-@ToString(exclude = "article")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,9 +22,8 @@ public class Comment extends BaseEntity {
     @Column(name = "comment_id", nullable = false)
     private Long commentId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "article_id", nullable = false)
-    private Article article;
+    @Column(name = "article_id", nullable = false)
+    private Long articleId;
 
     @Column(name = "writer_id", nullable = false)
     private Long writerId;
