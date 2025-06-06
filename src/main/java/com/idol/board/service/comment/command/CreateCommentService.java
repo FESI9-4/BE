@@ -15,38 +15,26 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class CreateCommentService implements CreateCommentUseCase {
-    private final ArticleRepository articleJpaRepository;
-    private final CommentRepository commentJpaRepository;
+    private final ArticleRepository articleRepository;
+    private final CommentRepository commentRepository;
     private final Snowflake snowflake = new Snowflake();        // 대댓글 판단을 위해 service에서 사용
 
     @Override
     @Transactional
     public Long createComment(CommentCreateRequestDto requestDto, Long writerId, Long articleId) {
-        Article article = articleJpaRepository.findById(articleId)
+        Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new ArticleNotFoundException(articleId));
 
         // Comment(부모 객체) 값이 반환되었다면 대댓글, NUll 반환되었다면 부모 객체
         Comment parent = findParent(requestDto);
 
-        Comment comment = commentJpaRepository.save(
+        Comment comment = commentRepository.save(
                 requestDto.toEntity(
                         snowflake.nextId(),
-                        article,
+                        article.getArticleId(),
                         writerId,
                         parent == null ? null : parent.getCommentId()
                 ));
-
-//        Comment comment = Comment.builder()
-//                .commentId(snowflake.nextId())
-//                .article(article)
-//                .writerId(writerId)
-//                .content(requestDto.content())
-//                .parentCommentId(parent == null ? null : parent.getCommentId())
-//                .secret(requestDto.secret())
-//                .build();
-
-        // 연관관계 편의 메서드
-//        article.addComment(comment);
 
         return comment.getCommentId();
     }
@@ -61,9 +49,8 @@ public class CreateCommentService implements CreateCommentUseCase {
         }
 
         // 부모 댓글이 존재한다면 해당 request는 대댓글이므로 해당 부모 객체의 값을 불러옴
-        return commentJpaRepository.findById(parentCommentId)
+        return commentRepository.findById(parentCommentId)
                 .filter(Comment::isRoot)                   // 해당 객체가 부모 객체인지 확인
                 .orElseThrow();
     }
-
 }
