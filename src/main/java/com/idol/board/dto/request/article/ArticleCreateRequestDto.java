@@ -32,17 +32,11 @@ public record ArticleCreateRequestDto(
     );
 
 
-    public Article toEntity(Long writerId) {
-        Location location = Location.builder()
-                .roadNameAddress(roadNameAddress)
-                .latitude(latitude)
-                .longitude(longitude)
-                .build();
-
+    public Article toEntity(Long writerId, Long locationId) {
         return Article.builder()
                 .writerId(writerId)
                 .title(title)
-                .location(location)
+                .locationId(locationId)
                 .articleImageKey(imageKey)
                 .description(description)
                 .bigCategory(SPECIAL_CATEGORIES.contains(smallCategory) ? BigCategory.GO_TYPE : BigCategory.DOING_TYPE)
@@ -51,7 +45,6 @@ public record ArticleCreateRequestDto(
                 .deadline(deadline)
                 .minPerson(minPerson)
                 .maxPerson(maxPerson)
-                .currentPerson(1)
                 .openStatus(PENDING_STATUS)
                 .useStatus(UPCOMING_STATUS)
                 .build();
