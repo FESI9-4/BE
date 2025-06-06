@@ -36,7 +36,7 @@ public class DeleteCommentService implements DeleteCommentUseCase {
 
     // 자식 댓글이 있는지만 확인하면 되는 것이므로 해당 카운트가 2개까지 카운트 하고 2개이면 대댓글이 있다고 판단 (2개 이상부터는 대댓글이 있는 것이기에 2개까지 구해도 됨)
     private boolean hasChildren(Comment comment) {
-        return commentRepository.countBy(comment.getArticle().getArticleId(), comment.getParentCommentId(), 2L) == 2;
+        return commentRepository.countBy(comment.getArticleId(), comment.getParentCommentId(), 2L) == 2;
     }
 
     // 재귀적으로 부모객체가 삭제되어 있는 상태에서 대댓글을 삭제한다면 부모댓글과 대댓글을 모두 완전 삭제 시킴
