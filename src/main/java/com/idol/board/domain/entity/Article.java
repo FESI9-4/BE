@@ -33,28 +33,26 @@ public class Article extends BaseEntity {
     @Column(name = "article_id", nullable = false)
     private Long articleId;
 
-    // Todo :: writerId가 있는데 굳이 userId도 필요한가?
+    // TODO :: Member Table과 매핑
 //    @Column(name = "user_id", nullable = false)
 //    private Long userId;
 
-    // TODO :: Member Table과 매핑
+    // TODO :: UserId값 저장 (아이디 이름)
     @Column(name = "writer_id", nullable = false)
     private Long writerId;
 
     @Column(name = "title", nullable = false)
     private String title;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "location_id", unique = true) // 외래키, UNIQUE로 1:1 보장
-    private Location location;
-
-//    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Comment> comments = new ArrayList<>();
+    @Column(name = "location_id", nullable = false)
+    private Long locationId;
 
     @Column(name = "big_category", nullable = false)
+    @Enumerated(EnumType.STRING)
     private BigCategory bigCategory;
 
     @Column(name = "small_category", nullable = false)
+    @Enumerated(EnumType.STRING)
     private SmallCategory smallCategory;
 
     @Column(name = "description", nullable = false)
@@ -70,7 +68,7 @@ public class Article extends BaseEntity {
     private Integer minPerson;
 
     @Column(name = "current_person", nullable = false)
-    private Integer currentPerson;
+    private Integer currentPerson = 1;
 
     @Column(name = "max_person", nullable = false)
     private Integer maxPerson;
@@ -79,9 +77,11 @@ public class Article extends BaseEntity {
     private String articleImageKey;
 
     @Column(name = "open_status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private OpenStatus openStatus;
 
     @Column(name = "use_status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private UseStatus useStatus;
 
     public void update(ArticleUpdateRequestDto requestDto) {
