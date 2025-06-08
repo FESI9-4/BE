@@ -1,10 +1,8 @@
 package com.idol.board.dto.response.comment;
 
-import com.idol.board.domain.entity.Comment;
-import com.idol.board.repository.mapper.CommentReadDao;
+import com.idol.board.repository.mapper.CommentReadQueryResult;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 public record CommentResponseDto(
         Long commentId,
@@ -16,14 +14,14 @@ public record CommentResponseDto(
         boolean secret
 ) {
 
-    public static CommentResponseDto from(CommentReadDao dao){
+    public static CommentResponseDto from(CommentReadQueryResult result){
         return new CommentResponseDto(
-                dao.commentId(),
-                dao.content(),
-                dao.parentCommentId(),
-                dao.writerId(),
-                dao.isDeleted(),
-                dao.createdAt(),
-                dao.secret());
+                result.commentId(),
+                result.content(),
+                result.parentCommentId(),
+                result.writerId(),
+                result.isDeleted(),
+                result.createdAt(),
+                result.secret());
     }
 }
