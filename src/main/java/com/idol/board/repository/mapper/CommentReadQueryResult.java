@@ -1,6 +1,6 @@
 package com.idol.board.repository.mapper;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public record CommentReadQueryResult(
         Long commentId,
@@ -8,7 +8,7 @@ public record CommentReadQueryResult(
         Long parentCommentId,
         Long writerId,
         boolean isDeleted,
-        Timestamp createdAt,
+        LocalDateTime createdAt,
         boolean secret
 ){
 }
