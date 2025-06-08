@@ -1,62 +1,50 @@
 package com.idol.imageUpload.service.command;
 
-import com.amazonaws.HttpMethod;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.Headers;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+
 import com.idol.imageUpload.dto.GetS3UrlDto;
 import com.idol.imageUpload.useCase.ImageExpirationUseCase;
 import com.idol.imageUpload.useCase.ImageUploadUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import java.net.URL;
-import java.util.Date;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class ImagePostService implements ImageUploadUseCase {
-    private final AmazonS3 amazonS3Client;
+
+    private final S3Presigner s3Presigner;
     private final ImageExpirationUseCase  imageExpirationUseCase;
 
     // 버킷 이름
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    // S3에 이미지 업로드 주소 URL 요청
+    @Override
+    public GetS3UrlDto getPostS3Url(Long userId, String fileName) {
+        String key = "profile/" + userId + "/" + UUID.randomUUID() + "/" + fileName;
 
-    // 이미지 S3 업로드
-    @Transactional(readOnly = true)
-    public GetS3UrlDto getPostS3Url(Long memberId, String filename) {
-        // filename 설정하기(profile 경로 + 멤버ID + 랜덤 값)
-        String key = "profile/" + memberId + "/" + UUID.randomUUID() + "/" + filename;
+        // PutObjectRequest: S3에 객체를 업로드하기 위한 요청
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
 
-        // url 유효기간 설정하기(1시간)
-        Date expiration = imageExpirationUseCase.getExpiration();
+        // PresignedPutObjectRequest: PUT 요청을 위한 presigned URL 생성 요청
+        PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(builder -> builder
+                .putObjectRequest(putObjectRequest)
+                .signatureDuration(imageExpirationUseCase.getExpirationDuration())
+                .build());
 
-        // presigned url 생성하기
-        GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                getPostGeneratePresignedUrlRequest(key, expiration);
+        // presignPutObject: PUT 요청을 위한 presigned URL 생성
+        URL url = presignedRequest.url();
 
-        URL url = amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
-
-        // return
-        return new GetS3UrlDto(url.toExternalForm(), key);
+        return new GetS3UrlDto(url.toString(), key);
     }
 
-    /* post 용 URL 생성하는 메소드 */
-    private GeneratePresignedUrlRequest getPostGeneratePresignedUrlRequest(String fileName, Date expiration) {
-        GeneratePresignedUrlRequest generatePresignedUrlRequest
-                = new GeneratePresignedUrlRequest(bucket, fileName)
-                .withMethod(HttpMethod.PUT)
-                .withKey(fileName)
-                .withExpiration(expiration);
-//        generatePresignedUrlRequest.addRequestParameter(
-//                Headers.S3_CANNED_ACL,
-//                CannedAccessControlList.PublicRead.toString());
-        return generatePresignedUrlRequest;
-    }
 }
