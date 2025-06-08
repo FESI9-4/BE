@@ -4,18 +4,14 @@ import com.idol.board.dto.request.comment.CommentCreateRequestDto;
 import com.idol.board.dto.request.comment.CommentUpdateRequestDto;
 import com.idol.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.*;
 
 @Entity
 @Table(name = "comment")
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Where(clause = "is_deleted = false")
 public class Comment extends BaseEntity {
 
     @Id
@@ -37,9 +33,14 @@ public class Comment extends BaseEntity {
     @Column(name = "secret", nullable = false)
     private boolean secret;
 
-//    public void setArticle(Article article) {
-//        this.article = article;
-//    }
+    public Comment(Long commentId, Long articleId, Long writerId, String content, Long parentCommentId, boolean secret) {
+        this.commentId = commentId;
+        this.articleId = articleId;
+        this.writerId = writerId;
+        this.content = content;
+        this.parentCommentId = parentCommentId;
+        this.secret = secret;
+    }
 
     public boolean isRoot() {
         return parentCommentId.longValue() == commentId;
