@@ -10,13 +10,14 @@ public record CommentCreateRequestDto(
 ) {
 
     public Comment toEntity(Long commentId, Long articleId, Long writerId, Long parentCommentId) {
-        return Comment.builder()
-                .commentId(commentId)
-                .content(this.content)
-                .parentCommentId(parentCommentId == null ? commentId : parentCommentId)
-                .articleId(articleId)
-                .writerId(writerId)
-                .secret(this.secret)
-                .build();
+
+        return new Comment(
+                commentId,
+                articleId,
+                writerId,
+                this.content,
+                parentCommentId == null ? commentId : parentCommentId,
+                this.secret
+        );
     }
 }
