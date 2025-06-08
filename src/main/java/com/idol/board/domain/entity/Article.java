@@ -12,8 +12,6 @@ import lombok.*;
 import org.hibernate.annotations.*;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "article")
