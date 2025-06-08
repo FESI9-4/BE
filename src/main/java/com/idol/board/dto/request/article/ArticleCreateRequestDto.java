@@ -3,7 +3,6 @@ package com.idol.board.dto.request.article;
 import com.idol.board.domain.BigCategory;
 import com.idol.board.domain.SmallCategory;
 import com.idol.board.domain.entity.Article;
-import com.idol.board.domain.entity.Location;
 
 import java.sql.Timestamp;
 import java.util.Set;
@@ -33,20 +32,19 @@ public record ArticleCreateRequestDto(
 
 
     public Article toEntity(Long writerId, Long locationId) {
-        return Article.builder()
-                .writerId(writerId)
-                .title(title)
-                .locationId(locationId)
-                .articleImageKey(imageKey)
-                .description(description)
-                .bigCategory(SPECIAL_CATEGORIES.contains(smallCategory) ? BigCategory.GO_TYPE : BigCategory.DOING_TYPE)
-                .smallCategory(smallCategory)
-                .date(date)
-                .deadline(deadline)
-                .minPerson(minPerson)
-                .maxPerson(maxPerson)
-                .openStatus(PENDING_STATUS)
-                .useStatus(UPCOMING_STATUS)
-                .build();
+        return new Article(
+                writerId,
+                title,
+                locationId,
+                SPECIAL_CATEGORIES.contains(smallCategory) ? BigCategory.GO_TYPE : BigCategory.DOING_TYPE,
+                smallCategory,
+                description,
+                date,
+                deadline,
+                minPerson,
+                maxPerson,
+                imageKey,
+                PENDING_STATUS,
+                UPCOMING_STATUS);
     }
 }
