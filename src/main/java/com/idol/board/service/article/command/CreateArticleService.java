@@ -12,20 +12,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CreateArticleService implements CreateArticleUseCase {
 
     private final ArticleRepository articleRepository;
     private final LocationRepository locationRepository;
 
     @Override
-    @Transactional
     public Long createArticle(ArticleCreateRequestDto requestDto, Long writerId) {
         Location location = locationRepository.save(
-                Location.builder()
-                        .latitude(requestDto.latitude())
-                        .longitude(requestDto.longitude())
-                        .roadNameAddress(requestDto.roadNameAddress())
-                        .build()
+                new Location(
+                        requestDto.latitude(),
+                        requestDto.longitude(),
+                        requestDto.roadNameAddress()
+                )
         );
 
 
