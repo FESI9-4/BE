@@ -12,8 +12,6 @@ public interface CommentRepositoryCustom {
 
     Long relatedCommentcountBy(Long articleId, Long parentCommentId, Long limit);
 
-    void softDeleteAllByArticleId(Long articleId);
-
     List<CommentReadQueryResult> findAllInfiniteScroll(Long articleId, Long limit);
     List<CommentReadQueryResult> findAllInfiniteScroll(Long articleId, Long lastParentCommentId, Long lastCommentId, Long limit);
 
