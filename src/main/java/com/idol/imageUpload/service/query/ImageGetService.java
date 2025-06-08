@@ -1,8 +1,5 @@
 package com.idol.imageUpload.service.query;
 
-import com.amazonaws.HttpMethod;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.idol.imageUpload.dto.GetS3UrlDto;
 
 import com.idol.imageUpload.service.command.ImageExpirationService;
@@ -12,41 +9,44 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.net.URL;
+import java.time.Duration;
 import java.util.Date;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
 public class ImageGetService implements ImageGetUserCase {
-    private final AmazonS3 amazonS3Client;
+
+    private final S3Presigner s3Presigner;
     private final ImageExpirationUseCase imageExpirationUseCase;
 
     // 버킷 이름
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    // S3 이미지 호출
+    // 업로드 된 이미지 URL 호출
     @Override
-    @Transactional(readOnly = true)
     public GetS3UrlDto getGetS3Url(String key) {
-        // url 유효기간 설정하기(1시간)
-        Date expiration = imageExpirationUseCase.getExpiration();
 
-        // presigned url 생성하기
-        GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                getGetGeneratePresignedUrlRequest(key, expiration);
+        GetObjectRequest objectRequest = GetObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
 
-        URL url = amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(imageExpirationUseCase.getExpirationDuration())
+                .getObjectRequest(objectRequest)
+                .build();
 
-        // return
-        return new GetS3UrlDto(url.toExternalForm(), key);
-    }
+        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
 
-    /* get 용 URL 생성하는 메소드 */
-    private GeneratePresignedUrlRequest getGetGeneratePresignedUrlRequest(String key, Date expiration) {
-        return new GeneratePresignedUrlRequest(bucket, key)
-                .withMethod(HttpMethod.GET)
-                .withExpiration(expiration);
+        return new GetS3UrlDto(presignedRequest.url().toExternalForm(), key);
     }
 }
