@@ -7,10 +7,9 @@ import com.idol.board.domain.UseStatus;
 import com.idol.board.dto.request.article.ArticleUpdateRequestDto;
 import com.idol.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.*;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -20,11 +19,8 @@ import java.util.List;
 @Table(name = "article")
 @Getter
 @ToString
-@Builder
-@AllArgsConstructor
+// 생성자마다 builder 사용
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Where(clause = "is_deleted = false")
-@SQLDelete(sql = "UPDATE article SET is_deleted = true WHERE article_id = ?")  // 삭제 시 상태값 변경
 public class Article extends BaseEntity {
 
     @Id
@@ -67,8 +63,12 @@ public class Article extends BaseEntity {
     @Column(name = "min_person", nullable = false)
     private Integer minPerson;
 
+    // Integer에는 null 값이 들어갈 위험이 있어서 지향
+
     @Column(name = "current_person", nullable = false)
-    private Integer currentPerson = 1;
+    private Integer currentPerson;
+    // 숫자 측정 말고 어차피 사람들 포함된 List 객체로 할 것이기 때문에, 해당 객체 삭제하고, 사이즈 값 반환해줌s
+
 
     @Column(name = "max_person", nullable = false)
     private Integer maxPerson;
@@ -83,6 +83,25 @@ public class Article extends BaseEntity {
     @Column(name = "use_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private UseStatus useStatus;
+
+
+
+    public Article(Long writerId, String title, Long locationId, BigCategory bigCategory, SmallCategory smallCategory, String description, Timestamp date, Timestamp deadline, Integer minPerson, Integer maxPerson, String articleImageKey, OpenStatus openStatus, UseStatus useStatus) {
+        this.writerId = writerId;
+        this.title = title;
+        this.locationId = locationId;
+        this.bigCategory = bigCategory;
+        this.smallCategory = smallCategory;
+        this.description = description;
+        this.date = date;
+        this.deadline = deadline;
+        this.minPerson = minPerson;
+        this.maxPerson = maxPerson;
+        this.articleImageKey = articleImageKey;
+        this.openStatus = openStatus;
+        this.useStatus = useStatus;
+        this.currentPerson = 1;
+    }
 
     public void update(ArticleUpdateRequestDto requestDto) {
         if (requestDto.title() != null) this.title = requestDto.title();
