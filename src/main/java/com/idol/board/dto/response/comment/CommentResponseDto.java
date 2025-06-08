@@ -21,7 +21,7 @@ public record CommentResponseDto(
                 result.parentCommentId(),
                 result.writerId(),
                 result.isDeleted(),
-                result.createdAt(),
+                Timestamp.valueOf(result.createdAt()),
                 result.secret());
     }
 }

@@ -1,7 +1,10 @@
 package com.idol.board.repository.comment;
 
 import com.idol.board.domain.entity.Comment;
+import com.idol.board.domain.entity.QComment;
 import com.idol.board.repository.mapper.CommentReadQueryResult;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -65,33 +68,32 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
         return ((Number) query.getSingleResult()).longValue();
     }
 
-    @Override
-    public void softDeleteAllByArticleId(Long articleId) {
-        String sql = "UPDATE Comment c SET c.isDeleted = true WHERE c.articleId = :articleId";
-        Query query = entityManager.createQuery(sql)
-                .setParameter("articleId", articleId);
-        query.executeUpdate();
-    }
-
-
     // 맨 처음 데이터 출력
     @Override
     public List<CommentReadQueryResult> findAllInfiniteScroll(Long articleId, Long limit) {
+        QComment comment = QComment.comment;
 
-        String sql = "SELECT comment_id ,content , parent_comment_id, " +
-                "writer_id, is_deleted, created_at , secret " +
-                "from comment " +
-                "where is_deleted = false and article_id = ?1 " +
-                "order by parent_comment_id asc, comment_id asc " +
-                "limit ?2";  // 위치 기반 파라미터로 변경
-
-        Query query = entityManager.createNativeQuery(sql, CommentReadQueryResult.class)
-                .setParameter(1, articleId)
-                .setParameter(2, limit);
-
-        return query.getResultList();
+        return queryFactory
+                .select(Projections.constructor(CommentReadQueryResult.class,
+                        comment.commentId,
+                        comment.content,
+                        comment.parentCommentId,
+                        comment.writerId,
+                        comment.isDeleted,
+                        comment.createdAt,
+                        comment.secret))
+                .from(comment)
+                .where(
+                        comment.isDeleted.eq(false),
+                        comment.articleId.eq(articleId)
+                )
+                .orderBy(
+                        comment.parentCommentId.asc(),
+                        comment.commentId.asc()
+                )
+                .limit(limit)
+                .fetch();
     }
-
 
 
     // 스크롤 n 페이지 데이터 출력
@@ -101,22 +103,32 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
     // 해당 코드에서 parent_comment_id값이 출력되는 댓글의 마지막 값인 lastParentCommentId보다 같으면서 commentId값이 lastCommentId보다 큰 경우를 찾아 대댓글까지 출력시킴
     @Override
     public List<CommentReadQueryResult> findAllInfiniteScroll(Long articleId, Long lastParentCommentId, Long lastCommentId, Long limit) {
-        String sql = "SELECT comment_id ,content , parent_comment_id, " +
-                "writer_id, is_deleted, created_at , secret " +
-                "from comment " +
-                "where is_deleted = false and article_id = ?1 and (" +
-                "   parent_comment_id > ?2 or " +
-                "   (parent_comment_id = ?2 and comment_id > ?3) " +
-                ")" +
-                "order by parent_comment_id asc, comment_id asc " +
-                "limit ?4";
+        QComment comment = QComment.comment;
 
-        Query query = entityManager.createNativeQuery(sql, CommentReadQueryResult.class)
-                .setParameter(1, articleId)
-                .setParameter(2, lastParentCommentId)
-                .setParameter(3, lastCommentId)
-                .setParameter(4, limit);
-
-        return query.getResultList();
+        return queryFactory
+                .select(Projections.constructor(CommentReadQueryResult.class,
+                        comment.commentId,
+                        comment.content,
+                        comment.parentCommentId,
+                        comment.writerId,
+                        comment.isDeleted,
+                        comment.createdAt,  // LocalDateTime 타입
+                        comment.secret))
+                .from(comment)
+                .where(
+                        comment.isDeleted.eq(false),
+                        comment.articleId.eq(articleId),
+                        new BooleanBuilder()
+                                .or(comment.parentCommentId.gt(lastParentCommentId))
+                                .or(new BooleanBuilder()
+                                        .and(comment.parentCommentId.eq(lastParentCommentId))
+                                        .and(comment.commentId.gt(lastCommentId)))
+                )
+                .orderBy(
+                        comment.parentCommentId.asc(),
+                        comment.commentId.asc()
+                )
+                .limit(limit)
+                .fetch();
     }
 }
