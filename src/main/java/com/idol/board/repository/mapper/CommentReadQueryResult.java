@@ -2,7 +2,7 @@ package com.idol.board.repository.mapper;
 
 import java.sql.Timestamp;
 
-public record CommentReadDao (
+public record CommentReadQueryResult(
         Long commentId,
         String content,
         Long parentCommentId,
