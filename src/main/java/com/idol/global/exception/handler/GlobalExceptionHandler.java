@@ -3,6 +3,7 @@ package com.idol.global.exception.handler;
 import com.idol.global.exception.ArticleNotFoundException;
 import com.idol.global.exception.AuthenticationException;
 import com.idol.global.exception.BadRequestException;
+import com.idol.global.exception.NotFoundException;
 import com.idol.global.exception.CommentNotFoundException;
 import com.idol.global.exception.ConflictException;
 import lombok.extern.slf4j.Slf4j;
@@ -49,19 +50,21 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
-    @ExceptionHandler(ArticleNotFoundException.class)
-    ProblemDetail handleArticleNotFoundException(final ArticleNotFoundException e) {
+    @ExceptionHandler(NotFoundException.class)
+    ProblemDetail handleNotFoundException(final NotFoundException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
-        problemDetail.setTitle("게시물을 찾을 수 없습니다");
+
+        // 리소스 타입에 따라 다른 제목 설정
+        String title = switch (e.getResourceName()) {
+            case "Article" -> "게시물을 찾을 수 없습니다";
+            case "Comment" -> "댓글을 찾을 수 없습니다";
+            default -> "리소스를 찾을 수 없습니다";
+        };
+
+        problemDetail.setTitle(title);
         return problemDetail;
     }
 
-    @ExceptionHandler(CommentNotFoundException.class)
-    ProblemDetail handleArticleNotFoundException(final CommentNotFoundException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
-        problemDetail.setTitle("댓글을 찾을 수 없습니다");
-        return problemDetail;
-    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ProblemDetail handleMethodArgumentNotValid(final MethodArgumentNotValidException e) {
