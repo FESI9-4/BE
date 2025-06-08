@@ -7,23 +7,23 @@ import com.idol.board.repository.article.ArticleRepository;
 import com.idol.board.repository.comment.CommentRepository;
 import com.idol.board.usecase.comment.command.CreateCommentUseCase;
 import com.idol.global.common.snowflake.Snowflake;
-import com.idol.global.exception.ArticleNotFoundException;
+import com.idol.global.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CreateCommentService implements CreateCommentUseCase {
     private final ArticleRepository articleRepository;
     private final CommentRepository commentRepository;
     private final Snowflake snowflake = new Snowflake();        // 대댓글 판단을 위해 service에서 사용
 
     @Override
-    @Transactional
     public Long createComment(CommentCreateRequestDto requestDto, Long writerId, Long articleId) {
-        Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new ArticleNotFoundException(articleId));
+        Article article = articleRepository.findByArticleId(articleId)
+                .orElseThrow(() -> new NotFoundException("Article", articleId));
 
         // Comment(부모 객체) 값이 반환되었다면 대댓글, NUll 반환되었다면 부모 객체
         Comment parent = findParent(requestDto);
