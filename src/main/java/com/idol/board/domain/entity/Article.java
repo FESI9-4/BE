@@ -59,17 +59,17 @@ public class Article extends BaseEntity {
     private Timestamp deadline;
 
     @Column(name = "min_person", nullable = false)
-    private Integer minPerson;
+    private int minPerson;
 
     // Integer에는 null 값이 들어갈 위험이 있어서 지향
 
     @Column(name = "current_person", nullable = false)
     private Integer currentPerson;
-    // 숫자 측정 말고 어차피 사람들 포함된 List 객체로 할 것이기 때문에, 해당 객체 삭제하고, 사이즈 값 반환해줌s
+    // 숫자 측정 말고 어차피 사람들 포함된 List 객체로 할 것이기 때문에, 해당 객체 삭제하고, 사이즈 값 반환해줌
 
 
     @Column(name = "max_person", nullable = false)
-    private Integer maxPerson;
+    private int maxPerson;
 
     @Column(name = "article_image_url", nullable = true)
     private String articleImageKey;
