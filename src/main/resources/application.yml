@@ -19,6 +19,17 @@ spring:
     show-sql: true
     open-in-view: false
 
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
+jwt:
+   secret: ${JWT_SECRET}
+   expiration: 1800000 # 30분 (밀리초)
+   refresh-expiration: 1209600000 # 14일 (밀리초)
+
 server:
   port: 8080
 

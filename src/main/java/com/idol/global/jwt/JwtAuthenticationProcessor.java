@@ -1,0 +1,28 @@
+package com.idol.global.jwt;
+
+import com.idol.domains.auth.service.JwtService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class JwtAuthenticationProcessor {
+
+    private final JwtService jwtService;
+
+    public JwtAuthenticationContext extractAuthenticationContext(String token) {
+        String memberId = jwtService.extractMemberId(token);
+        String userId = jwtService.extractClaim(token, "userId", String.class);
+        String role = jwtService.extractClaim(token, "role", String.class);
+
+        return JwtAuthenticationContextImpl.builder()
+                .memberId(memberId)
+                .userId(userId != null ? userId : "")
+                .role(role != null ? role : "USER")
+                .build();
+    }
+
+    public boolean isValidToken(String token) {
+        return jwtService.isTokenValid(token);
+    }
+}
