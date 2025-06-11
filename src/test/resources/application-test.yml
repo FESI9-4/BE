@@ -6,6 +6,12 @@ spring:
     username: sa
     password:
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ""
+
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -24,3 +30,4 @@ jwt:
   secret: testSecretKey123456789012345678901234567890
   expiration: 3600000
   refresh-expiration: 604800000
+

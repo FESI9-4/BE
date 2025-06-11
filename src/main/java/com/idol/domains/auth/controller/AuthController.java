@@ -1,10 +1,11 @@
 package com.idol.domains.auth.controller;
 
-import com.idol.domains.auth.dto.LoginRequestDto;
-import com.idol.domains.auth.service.JwtTokenService;
+import com.idol.domains.auth.config.JwtProperties;
+import com.idol.domains.auth.dto.request.LoginRequestDto;
+import com.idol.domains.auth.service.JwtService;
+import com.idol.domains.member.dto.response.AuthenticationResult;
+import com.idol.domains.member.usecase.AuthenticateMemberUseCase;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Tag(name = "AUTH API", description = "로그인/로그아웃 API")
@@ -21,92 +21,84 @@ import java.util.Map;
 @RestController
 public class AuthController {
 
-    private final JwtTokenService jwtTokenService;
+    private final JwtService jwtService;
+    private final JwtProperties jwtProperties;
+    private final AuthenticateMemberUseCase authenticateMemberUseCase;
 
-    // TODO 책임 분리
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequest) {
-        // TODO: 인증로직 구현
-        // 예: userService.authenticate(loginRequest.getUsername(), loginRequest.getPassword())
+        AuthenticationResult authResult = authenticateMemberUseCase.authenticate(loginRequest);
 
-        String username = loginRequest.email();
-
-        // TODO 임시값 인증 구현후 설정
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("memberId", "12345");
-
-        String accessToken = jwtTokenService.generateTokenWithClaims(username, claims);
-        String refreshToken = jwtTokenService.generateRefreshToken(username);
+        String accessToken = jwtService.generateAccessToken(authResult.getMemberId());
+        String refreshToken = jwtService.generateRefreshToken(authResult.getMemberId());
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
                 //.secure(true) // HTTPS 환경에서만 동작 설정 추후 배포후 적용예정
                 .path("/api/auth/refresh")
-
-                //TODO 상수화
-                .maxAge(7 * 24 * 60 * 60) // 7일
+                .maxAge(jwtProperties.getRefreshTokenExpiration())
                 .sameSite("Strict")
                 .build();
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Login successful");
-        response.put("username", username);
-        response.put("expiresIn", 3600);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header("Access-Control-Expose-Headers", HttpHeaders.AUTHORIZATION)
-                .body(response);
+                .body("로그인 성공");
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(HttpServletRequest request) {
-        String refreshToken = null;
-        Cookie[] cookies = request.getCookies();
-
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("refreshToken".equals(cookie.getName())) {
-                    refreshToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
+    public ResponseEntity<?> refresh(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken) {
 
         if (refreshToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Refresh token not found"));
         }
 
-        if (!jwtTokenService.isTokenValid(refreshToken)) {
+        if (!jwtService.validateRefreshToken(refreshToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid refresh token"));
         }
 
-        String username = jwtTokenService.extractUsername(refreshToken);
-
-        String newAccessToken = jwtTokenService.generateAccessToken(username);
-
-        String newRefreshToken = jwtTokenService.generateRefreshToken(username);
+        String memberId = jwtService.extractMemberId(refreshToken);
+        String newAccessToken = jwtService.generateAccessToken(memberId);
+        String newRefreshToken = jwtService.generateRefreshToken(memberId);
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", newRefreshToken)
                 .httpOnly(true)
-                .secure(true)
+                //.secure(true)
                 .path("/api/auth/refresh")
-                .maxAge(7 * 24 * 60 * 60) // 7일
+                .maxAge(jwtProperties.getRefreshTokenExpiration())
                 .sameSite("Strict")
                 .build();
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Token refreshed successfully");
-        response.put("expiresIn", 3600);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken)
                 .header("Access-Control-Expose-Headers", HttpHeaders.AUTHORIZATION)
-                .body(response);
+                .body("토큰 리프레쉬 성공");
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken) {
+
+        if (refreshToken != null && jwtService.isTokenValid(refreshToken)) {
+            String memberId = jwtService.extractMemberId(refreshToken);
+            jwtService.revokeRefreshToken(memberId);
+        }
+
+        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .path("/api/auth/refresh")
+                .maxAge(0)
+                .sameSite("Strict")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+                .body("로그아웃 성공");
     }
 
     @GetMapping("/validate")
@@ -119,13 +111,13 @@ public class AuthController {
         }
 
         String token = authHeader.substring(7);
-        boolean isValid = jwtTokenService.isTokenValid(token);
+        boolean isValid = jwtService.isTokenValid(token);
 
         if (isValid) {
-            String username = jwtTokenService.extractUsername(token);
+            String memberId = jwtService.extractMemberId(token);
             return ResponseEntity.ok(Map.of(
                     "valid", true,
-                    "username", username
+                    "memberId", memberId
             ));
         } else {
             return ResponseEntity.ok(Map.of(
