@@ -11,9 +11,8 @@ public enum ExceptionMessage {
 
     // 인증 관련
     AUTHENTICATION_FAILED("이메일 또는 비밀번호가 올바르지 않습니다."),
-    ACCOUNT_LOCKED("계정이 잠겨있습니다. 고객센터에 문의해주세요."),
-    ACCOUNT_DISABLED("비활성화된 계정입니다."),
-    TOO_MANY_LOGIN_ATTEMPTS("너무 많은 로그인 시도로 계정이 일시적으로 잠겼습니다. 30분 후 다시 시도해주세요."),
+    INVALID_PRINCIPAL_TYPE("유효하지 않은 인증입니다"),
+    AUTHENTICATION_MISSING("인증에 실패했습니다."),
 
     // 토큰 관련
     INVALID_TOKEN("유효하지 않은 토큰입니다."),

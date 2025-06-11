@@ -1,5 +1,6 @@
 package com.idol.global.jwt;
 
+import com.idol.domains.auth.domain.UserIdentity;
 import com.idol.domains.auth.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -68,8 +70,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            String username = jwtService.extractMemberId(jwt);
-            if (username == null) {
+            String memberId = jwtService.extractMemberId(jwt);
+            if (memberId == null) {
                 log.warn("JWT 토큰에서 사용자명을 추출할 수 없음");
                 return;
             }
@@ -77,12 +79,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String userId = extractUserIdClaim(jwt);
             String role = extractRoleClaim(jwt);
 
-            UsernamePasswordAuthenticationToken authToken = createAuthenticationToken(username, role);
+            UsernamePasswordAuthenticationToken authToken = createAuthenticationToken(memberId, role);
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(authToken);
 
-            log.info("JWT 인증 성공 - username: {}, userId: {}, role: {}", username, userId, role);
+            log.info("JWT 인증 성공 - username: {}, userId: {}, role: {}", memberId, userId, role);
         } catch (Exception e) {
             log.error("JWT 인증 정보 처리 실패: {}", e.getMessage());
         }
@@ -107,15 +109,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private UsernamePasswordAuthenticationToken createAuthenticationToken(String username, String role) {
+    private UsernamePasswordAuthenticationToken createAuthenticationToken(String memberId, String role) {
         String authorityRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
 
         List<SimpleGrantedAuthority> authorities = Collections.singletonList(
                 new SimpleGrantedAuthority(authorityRole)
         );
 
+        UserIdentity userIdentity = new UserIdentity(UUID.fromString(memberId));
+
         return new UsernamePasswordAuthenticationToken(
-                username,
+                userIdentity,
                 null,
                 authorities
         );
