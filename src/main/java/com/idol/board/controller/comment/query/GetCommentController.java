@@ -17,7 +17,7 @@ public class GetCommentController {
     private final ReadCommentUseCase readCommentUseCase;
 
     @GetMapping("/{articleId}/comment")
-    public ApiResponse<List<CommentResponseDto>> createComment(
+    public ApiResponse<List<CommentResponseDto>> readComment(
             @PathVariable Long articleId,
             @RequestParam(value = "lastParentCommentId", required = false) Long lastParentCommentId,
             @RequestParam(value = "lastCommentId", required = false) Long lastCommentId,
