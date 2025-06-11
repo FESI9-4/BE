@@ -12,6 +12,7 @@ import lombok.*;
 import org.hibernate.annotations.*;
 
 import java.sql.Timestamp;
+import java.util.Set;
 
 @Entity
 @Table(name = "article")
@@ -102,9 +103,16 @@ public class Article extends BaseEntity {
     }
 
     public void update(ArticleUpdateRequestDto requestDto) {
+        Set<SmallCategory> SPECIAL_CATEGORIES = Set.of(
+                SmallCategory.BUSRENTAL_TYPE,
+                SmallCategory.COMPANION_TYPE,
+                SmallCategory.AFTERPARTY_TYPE
+        );
+
         if (requestDto.title() != null) this.title = requestDto.title();
         if (requestDto.description() != null) this.description = requestDto.description();
         if (requestDto.smallCategory() != null) this.smallCategory = requestDto.smallCategory();
+        if (requestDto.smallCategory() != null) this.bigCategory = SPECIAL_CATEGORIES.contains(smallCategory) ? BigCategory.GO_TYPE : BigCategory.DOING_TYPE;
         if (requestDto.date() != null) this.date = requestDto.date();
         if (requestDto.deadline() != null) this.deadline = requestDto.deadline();
         if (requestDto.minPerson() != null) this.minPerson = requestDto.minPerson();
