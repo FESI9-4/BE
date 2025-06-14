@@ -11,7 +11,6 @@ import java.util.List;
 @Builder
 public class JwtAuthenticationContextImpl implements JwtAuthenticationContext {
     private final String memberId;
-    private final String userId;
     private final String role;
 
     @Override
