@@ -5,6 +5,7 @@ import com.idol.board.dto.request.comment.CommentUpdateRequestDto;
 import com.idol.board.usecase.comment.command.CreateCommentUseCase;
 import com.idol.board.usecase.comment.command.DeleteCommentUseCase;
 import com.idol.board.usecase.comment.command.UpdateCommentUseCase;
+import com.idol.domains.auth.util.annotation.MemberId;
 import com.idol.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,9 +24,9 @@ public class CommentController {
     @Operation(summary = "댓글 작성", description = "댓글 혹은 대댓글 작성합니다")
     @PostMapping("/{articleId}/comment")
     public ApiResponse<Long>  createComment(@PathVariable Long articleId, @RequestBody CommentCreateRequestDto requestDto) {
-        // TODO :: 인증 연결
-        Long userId = 1231414314L;
-        Long commentId = createCommentUseCase.createComment(requestDto, userId, articleId);
+        // TODO :: UserId 연동
+        Long writerId = 12341L;
+        Long commentId = createCommentUseCase.createComment(requestDto, writerId, articleId);
         
         return ApiResponse.ok(commentId, "댓글 생성 성공");
     }
@@ -33,8 +34,8 @@ public class CommentController {
     @Operation(summary = "댓글 삭제", description = "댓글 Soft Delete")
     @DeleteMapping("/{articleId}/comment/{commentId}")
     public ApiResponse<Long> deleteComment(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentId") Long commentId) {
-        // TODO :: 인증 연결
-        Long writerId = 1231414314L;
+        // TODO :: UserId 연동
+        Long writerId = 12341L;
         deleteCommentUseCase.delete(commentId,writerId);
         return ApiResponse.ok(commentId, "댓글 삭제 성공");
     }
@@ -42,8 +43,8 @@ public class CommentController {
     @Operation(summary = "댓글 수정", description = "댓글 수정")
     @PatchMapping("/{articleId}/comment")
     public ApiResponse<Long>  updateComment(@PathVariable Long articleId, @RequestBody CommentUpdateRequestDto requestDto) {
-        // TODO :: 인증 연결
-        Long writerId = 1231414314L;
+        // TODO :: UserId 연동
+        Long writerId = 12341L;
         Long commentId = updateCommentUseCase.updateComment(requestDto,writerId);
 
         return ApiResponse.ok(commentId, "댓글 생성 성공");
