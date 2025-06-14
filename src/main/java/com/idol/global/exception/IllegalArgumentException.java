@@ -8,7 +8,7 @@ public class IllegalArgumentException extends RuntimeException {
     private final Object fieldValue;    // 필드 값
 
     public IllegalArgumentException(String resourceName, Object fieldValue) {
-        super(String.format("%s 내용을 찾을 수 없습니다 : '%s'", resourceName,  fieldValue));
+        super(String.format("%s 접근 권한이 없습니다 : '%s'", resourceName,  fieldValue));
         this.resourceName = resourceName;
         this.fieldValue = fieldValue;
     }
