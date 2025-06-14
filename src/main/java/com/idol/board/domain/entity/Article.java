@@ -84,8 +84,8 @@ public class Article extends BaseEntity {
     private UseStatus useStatus;
 
 
-
-    public Article(Long writerId, String title, Long locationId, BigCategory bigCategory, SmallCategory smallCategory, String description, Timestamp date, Timestamp deadline, Integer minPerson, Integer maxPerson, String articleImageKey, OpenStatus openStatus, UseStatus useStatus) {
+    @Builder
+    private Article(Long writerId, String title, Long locationId, BigCategory bigCategory, SmallCategory smallCategory, String description, Timestamp date, Timestamp deadline, Integer minPerson, Integer maxPerson, String articleImageKey, OpenStatus openStatus, UseStatus useStatus){
         this.writerId = writerId;
         this.title = title;
         this.locationId = locationId;
@@ -101,6 +101,24 @@ public class Article extends BaseEntity {
         this.useStatus = useStatus;
         this.currentPerson = 1;
     }
+
+
+//    public Article(Long writerId, String title, Long locationId, BigCategory bigCategory, SmallCategory smallCategory, String description, Timestamp date, Timestamp deadline, Integer minPerson, Integer maxPerson, String articleImageKey, OpenStatus openStatus, UseStatus useStatus) {
+//        this.writerId = writerId;
+//        this.title = title;
+//        this.locationId = locationId;
+//        this.bigCategory = bigCategory;
+//        this.smallCategory = smallCategory;
+//        this.description = description;
+//        this.date = date;
+//        this.deadline = deadline;
+//        this.minPerson = minPerson;
+//        this.maxPerson = maxPerson;
+//        this.articleImageKey = articleImageKey;
+//        this.openStatus = openStatus;
+//        this.useStatus = useStatus;
+//        this.currentPerson = 1;
+//    }
 
     public void update(ArticleUpdateRequestDto requestDto) {
         Set<SmallCategory> SPECIAL_CATEGORIES = Set.of(
