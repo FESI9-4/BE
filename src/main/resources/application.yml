@@ -52,7 +52,7 @@ springdoc:
 cloud:
   aws:
     s3:
-      bucket: ${BUKET_NAME} # 버킷 이름
+      bucket: ${BUCKET_NAME} # 버킷 이름
     stack.auto: false
     region.static: ${REGION} # 버킷 리전
     credentials:
