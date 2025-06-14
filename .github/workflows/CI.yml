@@ -8,8 +8,10 @@ on:
       [opened, synchronize, reopened]
 
 permissions:
-  checks: write
   contents: read
+  pull-requests: write
+  checks: write
+  issues: write
 
 jobs:
   build:
@@ -105,6 +107,8 @@ jobs:
         if: always()
         with:
           files: '**/build/test-results/test/TEST-*.xml'
+          check_name: 'Test Results'
+          comment_mode: 'off'
 
       - name: 테스트 리포트 업로드
         uses: actions/upload-artifact@v4
