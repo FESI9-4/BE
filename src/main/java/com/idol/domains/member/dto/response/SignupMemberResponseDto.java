@@ -7,13 +7,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Builder
 public record SignupMemberResponseDto(
-        @Schema(description = "회원 ID", example = "123e4567-e89b-12d3-a456-426614174000")
-        UUID memberId,
+        @Schema(description = "회원 ID", example = "1234")
+        Long memberId,
 
         @Schema(description = "이메일", example = "member@example.com")
         String email,

@@ -1,6 +1,7 @@
 package com.idol.global.exception.handler;
 
 import com.idol.global.exception.BadRequestException;
+import com.idol.global.exception.ConflictException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -21,6 +22,16 @@ public class GlobalExceptionHandler {
 
         // 아래와 같이 필드 확장 가능
         problemDetail.setTitle("잘못된 요청입니다");
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    ProblemDetail handleConflictException(final ConflictException e) {
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+
+        problemDetail.setTitle("데이터 충돌 에러");
 
         return problemDetail;
     }

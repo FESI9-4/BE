@@ -7,8 +7,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
+import org.hibernate.annotations.GenericGenerator;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -17,9 +16,13 @@ import java.util.UUID;
 public class Member extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", nullable = false, columnDefinition = "BINARY(16)")
-    private UUID memberId;
+    @GeneratedValue(generator = "snowflake")
+    @GenericGenerator(
+            name = "snowflake-id",
+            strategy = "com.idol.global.common.snowflake.SnowflakeIdGenerator"
+    )
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
 
     @Column(name = "email", nullable = false)
     private String email;

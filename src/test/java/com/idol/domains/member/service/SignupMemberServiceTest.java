@@ -16,7 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,7 +53,7 @@ class SignupMemberServiceTest {
                 .nickname("테스트유저")
                 .build();
 
-        setMemberId(savedMember, UUID.randomUUID());
+        setMemberId(savedMember, ThreadLocalRandom.current().nextLong());
         setCreatedAt(savedMember, LocalDateTime.now());
     }
 
@@ -81,7 +81,7 @@ class SignupMemberServiceTest {
         verify(memberRepository).save(any(Member.class));
     }
 
-    private void setMemberId(Member member, UUID id) throws Exception {
+    private void setMemberId(Member member, Long id) throws Exception {
         Field idField = Member.class.getDeclaredField("memberId");
         idField.setAccessible(true);
         idField.set(member, id);
