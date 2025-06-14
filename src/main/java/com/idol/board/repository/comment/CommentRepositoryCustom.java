@@ -10,7 +10,7 @@ public interface CommentRepositoryCustom {
 
     Optional<Comment> findByCommentId(Long articleId);
 
-    Long relatedCommentcountBy(Long articleId, Long parentCommentId, Long limit);
+    Long relatedCommentCountBy(Long articleId, Long parentCommentId, Long limit);
 
     List<CommentReadQueryResult> findAllInfiniteScroll(Long articleId, Long limit);
     List<CommentReadQueryResult> findAllInfiniteScroll(Long articleId, Long lastParentCommentId, Long lastCommentId, Long limit);
