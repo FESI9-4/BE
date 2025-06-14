@@ -103,22 +103,9 @@ public class Article extends BaseEntity {
     }
 
 
-//    public Article(Long writerId, String title, Long locationId, BigCategory bigCategory, SmallCategory smallCategory, String description, Timestamp date, Timestamp deadline, Integer minPerson, Integer maxPerson, String articleImageKey, OpenStatus openStatus, UseStatus useStatus) {
-//        this.writerId = writerId;
-//        this.title = title;
-//        this.locationId = locationId;
-//        this.bigCategory = bigCategory;
-//        this.smallCategory = smallCategory;
-//        this.description = description;
-//        this.date = date;
-//        this.deadline = deadline;
-//        this.minPerson = minPerson;
-//        this.maxPerson = maxPerson;
-//        this.articleImageKey = articleImageKey;
-//        this.openStatus = openStatus;
-//        this.useStatus = useStatus;
-//        this.currentPerson = 1;
-//    }
+    public void updateOpenStatus(OpenStatus openStatus) {
+        this.openStatus = openStatus;
+    }
 
     public void update(ArticleUpdateRequestDto requestDto) {
         Set<SmallCategory> SPECIAL_CATEGORIES = Set.of(
