@@ -65,6 +65,20 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    ProblemDetail handleUserHasPermissionException(final NotFoundException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
+
+        // 리소스 타입에 따라 다른 제목 설정
+        String title = switch (e.getResourceName()) {
+            case "Article" -> "해당 게시물에 접근 권한이 없습니다";
+            case "Comment" -> "해당 댓글에 접근 권한이 없습니다";
+            default -> "리소스를 찾을 수 없습니다";
+        };
+
+        problemDetail.setTitle(title);
+        return problemDetail;
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ProblemDetail handleMethodArgumentNotValid(final MethodArgumentNotValidException e) {
