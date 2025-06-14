@@ -12,12 +12,10 @@ public class JwtAuthenticationProcessor {
 
     public JwtAuthenticationContext extractAuthenticationContext(String token) {
         String memberId = jwtService.extractMemberId(token);
-        String userId = jwtService.extractClaim(token, "userId", String.class);
         String role = jwtService.extractClaim(token, "role", String.class);
 
         return JwtAuthenticationContextImpl.builder()
                 .memberId(memberId)
-                .userId(userId != null ? userId : "")
                 .role(role != null ? role : "USER")
                 .build();
     }

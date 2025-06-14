@@ -48,3 +48,9 @@ springdoc:
     - /api/**
   packages-to-scan:
     - com.idol
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus

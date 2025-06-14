@@ -1,0 +1,175 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      [ main ]
+    types:
+      [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+  issues: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      DB_URL: ${{ secrets.DB_URL }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      TESTCONTAINERS_REUSE_ENABLE: true
+
+    steps:
+      - name: Github Repository 파일 불러오기
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: JDK 21 버전 설치
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Gradle 캐싱
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 빌드 권한 부여
+        run: chmod +x ./gradlew
+        shell: bash
+
+      - name: 의존성 확인
+        run: ./gradlew dependencies --configuration runtimeClasspath
+
+      - name: 빌드
+        run: ./gradlew build -x test
+
+  test:
+    runs-on: ubuntu-latest
+    env:
+      DB_URL: ${{ secrets.DB_URL }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      TESTCONTAINERS_REUSE_ENABLE: true
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Github Repository 파일 불러오기
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: JDK 21 버전 설치
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Gradle 캐싱
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 빌드 권한 부여
+        run: chmod +x ./gradlew
+        shell: bash
+
+      - name: 테스트 실행
+        run: ./gradlew test
+
+      - name: 테스트 결과 리포트
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: '**/build/test-results/test/TEST-*.xml'
+          check_name: 'Test Results'
+          comment_mode: 'off'
+
+      - name: 테스트 리포트 업로드
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-reports
+          path: '**/build/reports/tests/'
+          retention-days: 7
+
+  check-results:
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Comment on PR, if CI failed
+        if: ${{ needs.build.result == 'failure' || needs.test.result == 'failure' }}
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ github.TOKEN }}
+          script: |
+            const pull_number = ${{ github.event.pull_request.number }}
+            let failedJobs = [];
+            
+            if ('${{ needs.build.result }}' === 'failure') failedJobs.push('빌드');
+            if ('${{ needs.test.result }}' === 'failure') failedJobs.push('테스트');
+            
+            const body = `⚠️ CI 파이프라인 실패
+            
+            **실패한 작업:** ${failedJobs.join(', ')}
+            
+            로그를 확인하고 문제를 해결해주세요.`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pull_number,
+              body: body
+            })
+            
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pull_number,
+              labels: ['ci-failed']
+            })
+
+      - name: Remove failure label on success
+        if: ${{ needs.build.result == 'success' && needs.test.result == 'success' }}
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ github.TOKEN }}
+          script: |
+            const pull_number = ${{ github.event.pull_request.number }}
+            
+            try {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pull_number,
+                name: 'ci-failed'
+              });
+            } catch (error) {
+              // 라벨이 없을 수 있으므로 에러 무시
+            }

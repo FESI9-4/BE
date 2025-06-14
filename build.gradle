@@ -60,6 +60,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'com.h2database:h2'
+
+    // === Log ===
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '3.3.3'
 }
 
 tasks.named('test') {
