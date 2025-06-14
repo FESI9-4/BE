@@ -6,6 +6,7 @@ import com.idol.board.dto.request.article.ArticleUpdateRequestDto;
 import com.idol.board.repository.article.ArticleRepository;
 import com.idol.board.repository.location.LocationRepository;
 import com.idol.board.usecase.article.command.UpdateArticleUseCase;
+import com.idol.global.exception.IllegalArgumentException;
 import com.idol.global.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,8 @@ public class UpdateArticleService implements UpdateArticleUseCase {
                 .filter(not(Article::getIsDeleted))
                 .orElseThrow(() -> new NotFoundException("Article", articleId));
 
+        validateUserHasPermission(article, writerId);
+
         // Article 필드 업데이트
         article.update(requestDto);
 
@@ -36,5 +39,11 @@ public class UpdateArticleService implements UpdateArticleUseCase {
 
         location.update(requestDto);
         return article.getArticleId();
+    }
+
+    private void validateUserHasPermission(Article article, Long writerId) {
+        if (!article.getWriterId().equals(writerId)) {
+            throw new IllegalArgumentException("Article",article.getArticleId());
+        }
     }
 }
