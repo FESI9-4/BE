@@ -6,6 +6,7 @@ import com.idol.board.repository.article.ArticleRepository;
 import com.idol.board.repository.comment.CommentRepository;
 import com.idol.board.repository.location.LocationRepository;
 import com.idol.board.usecase.article.command.DeleteArticleUseCase;
+import com.idol.global.exception.IllegalArgumentException;
 import com.idol.global.exception.NotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +26,13 @@ public class DeleteArticleService implements DeleteArticleUseCase {
     private final LocationRepository locationRepository;
 
     @Override
-    public Long delete(Long articleId){
+    public Long delete(Long articleId, Long writerId){
+
+
         Article article = articleRepository.findByArticleId(articleId)
                 .orElseThrow(() -> new NotFoundException("Article", articleId));
 
+        validateUserHasPermission(article, writerId);
 
         List<Comment> comments = commentRepository.findByArticleId(articleId);
 
@@ -42,5 +46,11 @@ public class DeleteArticleService implements DeleteArticleUseCase {
         article.markAsDeleted();
 
         return articleId;
+    }
+
+    private void validateUserHasPermission(Article article, Long writerId) {
+        if (!article.getWriterId().equals(writerId)) {
+            throw new IllegalArgumentException("Article",article.getArticleId());
+        }
     }
 }

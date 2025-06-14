@@ -33,7 +33,9 @@ public class CommentController {
     @Operation(summary = "댓글 삭제", description = "댓글 Soft Delete")
     @DeleteMapping("/{articleId}/comment/{commentId}")
     public ApiResponse<Long> deleteComment(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentId") Long commentId) {
-        deleteCommentUseCase.delete(commentId);
+        // TODO :: 인증 연결
+        Long writerId = 1231414314L;
+        deleteCommentUseCase.delete(commentId,writerId);
         return ApiResponse.ok(commentId, "댓글 삭제 성공");
     }
 
@@ -41,8 +43,8 @@ public class CommentController {
     @PatchMapping("/{articleId}/comment")
     public ApiResponse<Long>  updateComment(@PathVariable Long articleId, @RequestBody CommentUpdateRequestDto requestDto) {
         // TODO :: 인증 연결
-        Long userId = 1231414314L;
-        Long commentId = updateCommentUseCase.updateComment(requestDto);
+        Long writerId = 1231414314L;
+        Long commentId = updateCommentUseCase.updateComment(requestDto,writerId);
 
         return ApiResponse.ok(commentId, "댓글 생성 성공");
     }

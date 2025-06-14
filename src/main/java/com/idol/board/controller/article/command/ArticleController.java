@@ -32,7 +32,8 @@ public class ArticleController {
     @Operation(summary = "게시글 삭제", description = "게시글 Soft Delete")
     @DeleteMapping("/{articleId}")
     public ApiResponse<Long> deleteArticle(@PathVariable("articleId") Long articleId) {
-        Long resultId = deleteArticleUseCase.delete(articleId);
+        Long writerId = 1312441414L;
+        Long resultId = deleteArticleUseCase.delete(articleId, writerId);
 
         return ApiResponse.ok(resultId, "게시물 삭제가 완료되었습니다.");
     }
