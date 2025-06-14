@@ -1,6 +1,7 @@
 package com.idol.global.exception.handler;
 
 import com.idol.global.exception.BadRequestException;
+import com.idol.global.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -22,6 +23,36 @@ public class GlobalExceptionHandler {
         // 아래와 같이 필드 확장 가능
         problemDetail.setTitle("잘못된 요청입니다");
 
+        return problemDetail;
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    ProblemDetail handleNotFoundException(final NotFoundException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+
+        // 리소스 타입에 따라 다른 제목 설정
+        String title = switch (e.getResourceName()) {
+            case "Article" -> "게시물을 찾을 수 없습니다";
+            case "Comment" -> "댓글을 찾을 수 없습니다";
+            default -> "리소스를 찾을 수 없습니다";
+        };
+
+        problemDetail.setTitle(title);
+        return problemDetail;
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    ProblemDetail handleUserHasPermissionException(final NotFoundException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
+
+        // 리소스 타입에 따라 다른 제목 설정
+        String title = switch (e.getResourceName()) {
+            case "Article" -> "해당 게시물에 접근 권한이 없습니다";
+            case "Comment" -> "해당 댓글에 접근 권한이 없습니다";
+            default -> "리소스를 찾을 수 없습니다";
+        };
+
+        problemDetail.setTitle(title);
         return problemDetail;
     }
 
