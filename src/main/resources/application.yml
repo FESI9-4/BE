@@ -52,9 +52,9 @@ springdoc:
 cloud:
   aws:
     s3:
-      bucket: codit-project # 버킷 이름
+      bucket: ${BUKET_NAME} # 버킷 이름
     stack.auto: false
-    region.static: ap-northeast-2 # 버킷 리전
+    region.static: ${REGION} # 버킷 리전
     credentials:
       access-key: ${ACCESS_KEY}
       secret-key: ${SECRET_KEY}
