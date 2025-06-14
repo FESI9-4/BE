@@ -11,8 +11,6 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import java.util.UUID;
-
 import static com.idol.global.exception.ExceptionMessage.AUTHENTICATION_MISSING;
 import static com.idol.global.exception.ExceptionMessage.INVALID_PRINCIPAL_TYPE;
 
@@ -22,7 +20,8 @@ public class MemberIdArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.hasParameterAnnotation(MemberId.class)
-                && parameter.getParameterType().equals(UUID.class);
+                && (parameter.getParameterType().equals(Long.class)
+                || parameter.getParameterType().equals(String.class));
     }
 
     @Override
@@ -36,10 +35,17 @@ public class MemberIdArgumentResolver implements HandlerMethodArgumentResolver {
         }
 
         if (authentication.getPrincipal() instanceof UserIdentity principal) {
-            return principal.memberId();
+            Class<?> parameterType = parameter.getParameterType();
+
+            if (parameterType.equals(Long.class)) {
+                return principal.memberId();
+            }
+
+            if (parameterType.equals(String.class)) {
+                return principal.getMemberIdAsString();
+            }
         }
 
         throw new AuthenticationException(INVALID_PRINCIPAL_TYPE);
     }
 }
-

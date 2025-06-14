@@ -5,6 +5,8 @@ import com.idol.domains.member.dto.request.SignupMemberRequestDto;
 import com.idol.domains.member.dto.response.SignupMemberResponseDto;
 import com.idol.domains.member.repository.MemberRepository;
 import com.idol.domains.member.usecase.SignupMemberUseCase;
+import com.idol.global.exception.ConflictException;
+import com.idol.global.exception.ExceptionMessage;
 import com.idol.global.util.PasswordEncryptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,13 +35,13 @@ public class SignupMemberService implements SignupMemberUseCase {
 
     private void validateDuplicateEmail(String email) {
         if (memberRepository.existsByMemberEmail(email)) {
-            throw new IllegalArgumentException("이미 사용중인 이메일입니다.");
+            throw new ConflictException(ExceptionMessage.EMAIL_ALREADY_EXISTS);
         }
     }
 
     private void validateDuplicateNickname(String nickname) {
         if (memberRepository.existsByNickname(nickname)) {
-            throw new IllegalArgumentException("이미 사용중인 닉네임입니다.");
+            throw new ConflictException(ExceptionMessage.NICKNAME_ALREADY_EXISTS);
         }
     }
 }

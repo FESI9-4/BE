@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @Component
@@ -70,13 +69,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            String memberId = jwtService.extractMemberId(jwt);
-            if (memberId == null) {
+            String memberIdStr = jwtService.extractMemberId(jwt);
+            if (memberIdStr == null) {
                 log.warn("JWT 토큰에서 사용자명을 추출할 수 없음");
                 return;
             }
 
-            String userId = extractUserIdClaim(jwt);
+            // Snowflake ID 파싱
+            Long memberId = parseMemberId(memberIdStr);
+            if (memberId == null) {
+                log.warn("유효하지 않은 Member ID 형식: {}", memberIdStr);
+                return;
+            }
+
             String role = extractRoleClaim(jwt);
 
             UsernamePasswordAuthenticationToken authToken = createAuthenticationToken(memberId, role);
@@ -84,18 +89,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(authToken);
 
-            log.info("JWT 인증 성공 - username: {}, userId: {}, role: {}", memberId, userId, role);
+            log.info("JWT 인증 성공 - memberId: {}, role: {}", memberId, role);
         } catch (Exception e) {
             log.error("JWT 인증 정보 처리 실패: {}", e.getMessage());
         }
     }
 
-    private String extractUserIdClaim(String jwt) {
+    private Long parseMemberId(String memberIdStr) {
         try {
-            return jwtService.extractClaim(jwt, "userId", String.class);
-        } catch (Exception e) {
-            log.debug("userId 클레임 추출 실패: {}", e.getMessage());
-            return null;
+            return Long.parseLong(memberIdStr);
+        } catch (NumberFormatException e) {
+            try {
+                return (long) memberIdStr.hashCode() & 0x7FFFFFFFFFFFFFFFL;
+            } catch (Exception ex) {
+                log.error("Member ID 파싱 실패: {}", memberIdStr);
+                return null;
+            }
         }
     }
 
@@ -109,14 +118,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private UsernamePasswordAuthenticationToken createAuthenticationToken(String memberId, String role) {
+    private UsernamePasswordAuthenticationToken createAuthenticationToken(Long memberId, String role) {
         String authorityRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
 
         List<SimpleGrantedAuthority> authorities = Collections.singletonList(
                 new SimpleGrantedAuthority(authorityRole)
         );
 
-        UserIdentity userIdentity = new UserIdentity(UUID.fromString(memberId));
+        UserIdentity userIdentity = new UserIdentity(memberId);
 
         return new UsernamePasswordAuthenticationToken(
                 userIdentity,

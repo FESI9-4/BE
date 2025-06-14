@@ -9,7 +9,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,18 +24,23 @@ public class RefreshTokenService {
     @Value("${jwt.refresh-expiration}")
     private Long refreshTokenExpiration;
 
+    public void saveRefreshToken(Long memberId, String token) {
+        String memberIdStr = String.valueOf(memberId);
+
+        deleteAllTokensForMember(memberIdStr);
+
+        RefreshToken refreshToken = RefreshToken.builder()
+                .id(UUID.randomUUID().toString())
+                .memberId(memberIdStr)
+                .token(token)
+                .expiration(refreshTokenExpiration / 1000)
+                .build();
+
+        refreshTokenRepository.save(refreshToken);
+    }
+
     public void saveRefreshToken(String memberId, String token) {
-        Optional<RefreshToken> existingToken = refreshTokenRepository.findByMemberId(memberId);
-
-        if (existingToken.isPresent()) {
-            RefreshToken existing = existingToken.get();
-
-            refreshTokenRepository.delete(existing);
-
-            redisTemplate.delete("refreshToken:" + existing.getId());
-            redisTemplate.delete("refreshToken:memberId:" + memberId);
-            redisTemplate.delete("refreshToken:token:" + existing.getToken());
-        }
+        deleteAllTokensForMember(memberId);
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .id(UUID.randomUUID().toString())
@@ -46,10 +50,15 @@ public class RefreshTokenService {
                 .build();
 
         refreshTokenRepository.save(refreshToken);
+        log.debug("Saved refresh token for member: {}", memberId);
     }
 
     public boolean validateRefreshToken(String token) {
         return refreshTokenRepository.findByToken(token).isPresent();
+    }
+
+    public String getRefreshTokenByMemberId(Long memberId) {
+        return getRefreshTokenByMemberId(String.valueOf(memberId));
     }
 
     public String getRefreshTokenByMemberId(String memberId) {
@@ -58,11 +67,28 @@ public class RefreshTokenService {
                 .orElse(null);
     }
 
-    public void deleteRefreshToken(String memberId) {
-        refreshTokenRepository.deleteByMemberId(memberId);
+    public void deleteRefreshToken(Long memberId) {
+        deleteRefreshToken(String.valueOf(memberId));
     }
 
-    public String getMemberIdByToken(String token) {
+    public void deleteRefreshToken(String memberId) {
+        deleteAllTokensForMember(memberId);
+    }
+
+    public Long getMemberIdByToken(String token) {
+        String memberIdStr = getMemberIdStringByToken(token);
+        if (memberIdStr != null) {
+            try {
+                return Long.parseLong(memberIdStr);
+            } catch (NumberFormatException e) {
+                log.error("Invalid member ID format: {}", memberIdStr);
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public String getMemberIdStringByToken(String token) {
         return refreshTokenRepository.findByToken(token)
                 .map(RefreshToken::getMemberId)
                 .orElse(null);
@@ -85,4 +111,16 @@ public class RefreshTokenService {
         });
     }
 
+    public boolean isValidMemberId(String memberId) {
+        if (memberId == null || memberId.isEmpty()) {
+            return false;
+        }
+
+        try {
+            Long id = Long.parseLong(memberId);
+            return id > 0;
+        } catch (NumberFormatException e) {
+                return false;
+        }
+    }
 }

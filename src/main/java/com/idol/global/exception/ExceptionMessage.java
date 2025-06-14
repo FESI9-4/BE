@@ -22,6 +22,7 @@ public enum ExceptionMessage {
     // 회원 관련
     MEMBER_NOT_FOUND("회원을 찾을 수 없습니다."),
     EMAIL_ALREADY_EXISTS("이미 사용 중인 이메일입니다."),
+    NICKNAME_ALREADY_EXISTS("이미 사용 중인 닉네임입니다."),
     INVALID_PASSWORD_FORMAT("비밀번호는 8자 이상, 영문/숫자/특수문자를 포함해야 합니다."),
 
     // 권한 관련
