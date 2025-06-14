@@ -67,11 +67,10 @@ public class DeleteCommentService implements DeleteCommentUseCase {
     }
 
     private void validateUserHasPermission(Comment comment, Long writerId) {
-        if (!comment.getWriterId().equals(writerId)) {
+        if (Long.compare(comment.getWriterId(), writerId) == 0) {
             throw new IllegalArgumentException("Comment",comment.getCommentId());
         }
     }
-
 
     private void validateCommentIsRoot(Comment comment) {
         if(!comment.isRoot()){
