@@ -42,7 +42,7 @@ public class UpdateArticleService implements UpdateArticleUseCase {
     }
 
     private void validateUserHasPermission(Article article, Long writerId) {
-        if (!article.getWriterId().equals(writerId)) {
+        if (Long.compare(article.getWriterId(), writerId) == 0) {
             throw new IllegalArgumentException("Article",article.getArticleId());
         }
     }
