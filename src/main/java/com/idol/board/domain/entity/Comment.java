@@ -33,6 +33,7 @@ public class Comment extends BaseEntity {
     @Column(name = "secret", nullable = false)
     private boolean secret;
 
+    @Builder
     public Comment(Long commentId, Long articleId, Long writerId, String content, Long parentCommentId, boolean secret) {
         this.commentId = commentId;
         this.articleId = articleId;

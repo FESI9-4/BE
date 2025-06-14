@@ -21,12 +21,11 @@ public class CreateArticleService implements CreateArticleUseCase {
     @Override
     public Long createArticle(ArticleCreateRequestDto requestDto, Long writerId) {
         Location location = locationRepository.save(
-                new Location(
-                        requestDto.latitude(),
-                        requestDto.longitude(),
-                        requestDto.roadNameAddress()
-                )
-        );
+                    Location.builder()
+                            .latitude(requestDto.latitude())
+                            .longitude(requestDto.longitude())
+                            .roadNameAddress(requestDto.roadNameAddress())
+                            .build());
 
 
         Article article = requestDto.toEntity(writerId,location.getLocationId());
