@@ -1,5 +1,6 @@
 package com.idol.board.service.article.query;
 
+import com.idol.board.domain.OpenStatus;
 import com.idol.board.domain.entity.Article;
 import com.idol.board.domain.entity.Location;
 import com.idol.board.domain.entity.Participant;
@@ -42,8 +43,16 @@ public class ReadArticleService implements ReadArticleUseCase {
 
         List<ParticipantResponseDto> participants = null;
 
+        validateCheckOpenStatus(article);
+
         ArticleReadResponseDto dto = ArticleReadResponseDto.from(article,location,participants,true,getS3UrlDto.preSignedUrl());
 
         return dto;
+    }
+
+    private void validateCheckOpenStatus(Article article) {
+        if(article.getCurrentPerson() >= article.getMinPerson()){
+            article.updateOpenStatus(OpenStatus.CONFIRMED_STATUS);
+        }
     }
 }
