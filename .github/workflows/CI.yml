@@ -103,7 +103,7 @@ jobs:
           files: '**/build/test-results/test/TEST-*.xml'
 
       - name: 테스트 리포트 업로드
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: test-reports
