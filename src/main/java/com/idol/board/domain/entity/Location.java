@@ -27,6 +27,7 @@ public class Location extends BaseEntity {
     @Column(name = "road_name_address", nullable = false)
     private String roadNameAddress;
 
+    @Builder
     public Location(double latitude, double longitude, String roadNameAddress) {
         this.latitude = latitude;
         this.longitude = longitude;
