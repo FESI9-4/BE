@@ -48,6 +48,7 @@ public class SecurityConfig {
                                 "/api/members/login",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
+                                "/fanfal/api-docs",
                                 "/actuator/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/board/*").permitAll()
