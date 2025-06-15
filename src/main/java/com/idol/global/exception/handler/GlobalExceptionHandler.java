@@ -1,5 +1,6 @@
 package com.idol.global.exception.handler;
 
+import com.idol.global.exception.AuthenticationException;
 import com.idol.global.exception.BadRequestException;
 import com.idol.global.exception.ConflictException;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,16 @@ public class GlobalExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
 
         problemDetail.setTitle("데이터 충돌 에러");
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    ProblemDetail handleAuthenticationException(final AuthenticationException e) {
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, e.getMessage());
+
+        problemDetail.setTitle("인증 실패");
 
         return problemDetail;
     }
