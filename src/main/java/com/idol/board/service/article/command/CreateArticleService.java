@@ -28,7 +28,7 @@ public class CreateArticleService implements CreateArticleUseCase {
                             .build());
 
 
-        Article article = requestDto.toEntity(writerId,location.getLocationId());
+        Article article = requestDto.toEntity(writerId,location.getLocationId(), requestDto.roadNameAddress());
         articleRepository.save(article);
 
         return article.getArticleId();
