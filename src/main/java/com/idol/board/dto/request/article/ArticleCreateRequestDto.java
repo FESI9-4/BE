@@ -34,11 +34,12 @@ public record ArticleCreateRequestDto(
     );
 
 
-    public Article toEntity(Long writerId, Long locationId) {
+    public Article toEntity(Long writerId, Long locationId, String locationAddress) {
         return Article.builder()
                 .writerId(writerId)
                 .title(title)
                 .locationId(locationId)
+                .locationAddress(locationAddress)
                 .bigCategory(SPECIAL_CATEGORIES.contains(smallCategory) ? BigCategory.GO_TYPE : BigCategory.DOING_TYPE)
                 .smallCategory(smallCategory)
                 .description(description)
