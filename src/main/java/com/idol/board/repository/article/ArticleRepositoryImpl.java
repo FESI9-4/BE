@@ -1,15 +1,22 @@
 package com.idol.board.repository.article;
 
+import com.idol.board.domain.BigCategory;
+import com.idol.board.domain.SmallCategory;
 import com.idol.board.domain.entity.Article;
 import com.idol.board.domain.entity.QArticle;
-import com.idol.board.domain.entity.QComment;
+import com.idol.board.repository.mapper.ArticleListReadQueryResult;
+import com.idol.board.repository.mapper.CommentReadQueryResult;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
-import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -32,16 +39,73 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
         );
     }
 
-//    public Optional<Article> findByArticleId(Long articleId){
-//        String sql = "select a from Article a where a.isDeleted = false and  a.articleId = :articleId";  // isDeleted 조건 제거
-//        Query query = entityManager.createQuery(sql)
-//                .setParameter("articleId", articleId);
-//
-//        try {
-//            return Optional.ofNullable((Article) query.getSingleResult());
-//        } catch (NoResultException e) {
-//            return Optional.empty();
-//        }
-//    }
+    @Override
+    public List<ArticleListReadQueryResult> findArticleList(BigCategory bigCategory, SmallCategory smallCategory, String location, Timestamp date, String sort, boolean sortAsc, Long limit, Long offset) {
+        return queryFactory
+                .select(Projections.constructor(ArticleListReadQueryResult.class,
+                        article.articleId,
+                        article.title,
+                        article.locationId,
+                        article.articleImageKey,
+                        article.date,
+                        article.deadline,
+                        article.createdAt,
+                        article.currentPerson,
+                        article.maxPerson,
+                        article.openStatus,
+                        article.useStatus))
+                .from(article)
+                .where(
+                        article.isDeleted.eq(false),
+                        eqBigCategory(bigCategory),
+                        eqSmallCategory(smallCategory),
+                        eqLocation(location),
+                        eqDate(date)
+                )
+                .orderBy(getOrderSpecifier(sort, sortAsc))
+                .limit(limit)
+                .offset(offset)
+                .fetch();
+    }
+
+    /*
+                    "from (" +
+                    "   select article_id from article " +
+                    "   where board_id = :boardId " +
+                    "   order by article_id desc " +
+                    "   limit :limit offset :offset " +
+                    ") t left join article on t.article_id = article.article_id ",
+     */
+
+    private BooleanExpression eqBigCategory(BigCategory bigCategory) {
+        return bigCategory != null ? article.bigCategory.eq(bigCategory) : null;
+    }
+
+    private BooleanExpression eqSmallCategory(SmallCategory smallCategory) {
+        return smallCategory != null ? article.smallCategory.eq(smallCategory) : null;
+    }
+
+    private BooleanExpression eqLocation(String location) {
+        return location != null ? article.locationAddress.contains(location) : null;
+    }
+
+    private BooleanExpression eqDate(Timestamp date) {
+        return date != null ? article.date.eq(date) : null;
+    }
+
+    private OrderSpecifier<?> getOrderSpecifier(String sort, boolean sortAsc) {
+        Order order = sortAsc ? Order.ASC : Order.DESC;
+
+        if (sort == null) {
+            return new OrderSpecifier<>(order, article.createdAt);
+        }
+
+        return switch (sort.toLowerCase()) {
+            case "recent" -> new OrderSpecifier<>(order, article.createdAt);
+            case "deadline" -> new OrderSpecifier<>(order, article.deadline);
+            case "currentperson" -> new OrderSpecifier<>(order, article.currentPerson);
+            default -> new OrderSpecifier<>(order, article.createdAt);
+        };
+    }
 
 }

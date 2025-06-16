@@ -1,11 +1,20 @@
 package com.idol.board.repository.article;
 
+import com.idol.board.domain.BigCategory;
+import com.idol.board.domain.SmallCategory;
 import com.idol.board.domain.entity.Article;
-import org.springframework.data.jpa.repository.Query;
+import com.idol.board.repository.mapper.ArticleListReadQueryResult;
+import org.springframework.data.domain.Page;
 
+import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 
 
 public interface ArticleRepositoryCustom {
     Optional<Article> findByArticleId(Long articleId);
+
+    List<ArticleListReadQueryResult> findArticleList(
+            BigCategory bigCategory, SmallCategory smallCategory, String location,
+            Timestamp date, String sort, boolean sortAsc, Long limit, Long offset);
 }
