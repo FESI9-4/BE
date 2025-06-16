@@ -35,7 +35,7 @@ public class AuthController {
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
                 //.secure(true) // HTTPS 환경에서만 동작 설정 추후 배포후 적용예정
-                .path("/api/auth/refresh")
+                .path("/")
                 .maxAge(jwtProperties.getRefreshTokenExpiration())
                 .sameSite("Strict")
                 .build();
@@ -91,7 +91,7 @@ public class AuthController {
 
         ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
-                .path("/api/auth/refresh")
+                .path("/")
                 .maxAge(0)
                 .sameSite("Strict")
                 .build();
