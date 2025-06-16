@@ -68,14 +68,6 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
                 .fetch();
     }
 
-    /*
-                    "from (" +
-                    "   select article_id from article " +
-                    "   where board_id = :boardId " +
-                    "   order by article_id desc " +
-                    "   limit :limit offset :offset " +
-                    ") t left join article on t.article_id = article.article_id ",
-     */
 
     private BooleanExpression eqBigCategory(BigCategory bigCategory) {
         return bigCategory != null ? article.bigCategory.eq(bigCategory) : null;
