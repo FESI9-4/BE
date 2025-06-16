@@ -46,6 +46,9 @@ public class Article extends BaseEntity {
     @Column(name = "location_id", nullable = false)
     private Long locationId;
 
+    @Column(name = "location_address", nullable = false)
+    private String locationAddress;
+
     @Column(name = "big_category", nullable = false)
     @Enumerated(EnumType.STRING)
     private BigCategory bigCategory;
@@ -89,10 +92,11 @@ public class Article extends BaseEntity {
 
 
     @Builder
-    private Article(Long writerId, String title, Long locationId, BigCategory bigCategory, SmallCategory smallCategory, String description, Timestamp date, Timestamp deadline, Integer minPerson, Integer maxPerson, String articleImageKey, OpenStatus openStatus, UseStatus useStatus){
+    private Article(Long writerId, String title, Long locationId, String locationAddress, BigCategory bigCategory, SmallCategory smallCategory, String description, Timestamp date, Timestamp deadline, Integer minPerson, Integer maxPerson, String articleImageKey, OpenStatus openStatus, UseStatus useStatus){
         this.writerId = writerId;
         this.title = title;
         this.locationId = locationId;
+        this.locationAddress = locationAddress;
         this.bigCategory = bigCategory;
         this.smallCategory = smallCategory;
         this.description = description;
@@ -105,7 +109,6 @@ public class Article extends BaseEntity {
         this.useStatus = useStatus;
         this.currentPerson = 1;
     }
-
 
     public void updateOpenStatus(OpenStatus openStatus) {
         this.openStatus = openStatus;
@@ -120,6 +123,7 @@ public class Article extends BaseEntity {
 
         if (requestDto.title() != null) this.title = requestDto.title();
         if (requestDto.description() != null) this.description = requestDto.description();
+        if(requestDto.roadNameAddress() != null) this.locationAddress = requestDto.roadNameAddress();
         if (requestDto.smallCategory() != null) this.smallCategory = requestDto.smallCategory();
         if (requestDto.smallCategory() != null) this.bigCategory = SPECIAL_CATEGORIES.contains(smallCategory) ? BigCategory.GO_TYPE : BigCategory.DOING_TYPE;
         if (requestDto.date() != null) this.date = requestDto.date();
