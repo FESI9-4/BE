@@ -23,7 +23,6 @@ import java.util.Set;
 @ToString
 // 생성자마다 builder 사용
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Where(clause = "is_deleted = false")
 public class Article extends BaseEntity {
 
 
