@@ -1,10 +1,8 @@
 package com.idol.global.exception.handler;
 
-import com.idol.global.exception.ArticleNotFoundException;
 import com.idol.global.exception.AuthenticationException;
 import com.idol.global.exception.BadRequestException;
 import com.idol.global.exception.NotFoundException;
-import com.idol.global.exception.CommentNotFoundException;
 import com.idol.global.exception.ConflictException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
