@@ -1,15 +1,14 @@
 package com.idol.global.exception.handler;
 
-import com.idol.global.exception.AuthenticationException;
-import com.idol.global.exception.BadRequestException;
-import com.idol.global.exception.NotFoundException;
-import com.idol.global.exception.ConflictException;
+import com.idol.global.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.lang.IllegalArgumentException;
 
 @RestControllerAdvice
 @Slf4j
@@ -65,7 +64,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     ProblemDetail handleUserHasPermissionException(final NotFoundException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
 
         // 리소스 타입에 따라 다른 제목 설정
         String title = switch (e.getResourceName()) {
@@ -86,6 +85,15 @@ public class GlobalExceptionHandler {
 
         problemDetail.setTitle("유효성 검증 실패");
 
+        return problemDetail;
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    ProblemDetail handleEnoughException(final ForbiddenException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
+
+
+        problemDetail.setTitle("현재 인원이 가득 찼습니다");
         return problemDetail;
     }
 

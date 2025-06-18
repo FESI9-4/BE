@@ -1,10 +1,9 @@
 package com.idol.board.domain.entity;
 
+import com.idol.board.domain.UseStatus;
+import com.idol.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
@@ -13,7 +12,7 @@ import org.hibernate.annotations.GenericGenerator;
 @ToString
 // 생성자마다 builder 사용
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Participant {
+public class Participant extends BaseEntity {
     @Id
     @GeneratedValue(generator = "snowflake-id")
     @GenericGenerator(name = "snowflake-id", strategy = "com.idol.global.common.snowflake.SnowflakeIdGenerator")
@@ -28,4 +27,15 @@ public class Participant {
 
     @Column(name = "nickname", nullable = false)
     private String nickname;
+
+    @Column(name = "writer_id", nullable = false)
+    private Long writerId;
+
+    @Builder
+    public Participant(Long articleId, String participantImageKey, String participantNickname, Long writerId) {
+        this.articleId = articleId;
+        this.imageKey = participantImageKey;
+        this.nickname = participantNickname;
+        this.writerId = writerId;
+    }
 }

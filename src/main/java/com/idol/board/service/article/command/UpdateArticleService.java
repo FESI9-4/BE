@@ -9,6 +9,7 @@ import com.idol.board.usecase.article.command.UpdateArticleUseCase;
 import com.idol.global.exception.IllegalArgumentException;
 import com.idol.global.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import static java.util.function.Predicate.not;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class UpdateArticleService implements UpdateArticleUseCase {
 
     private final ArticleRepository articleRepository;
@@ -42,7 +44,8 @@ public class UpdateArticleService implements UpdateArticleUseCase {
     }
 
     private void validateUserHasPermission(Article article, Long writerId) {
-        if (Long.compare(article.getWriterId(), writerId) == 0) {
+        if (article.getWriterId() != writerId) {
+            log.info(String.valueOf(article.getWriterId() == writerId));
             throw new IllegalArgumentException("Article",article.getArticleId());
         }
     }
