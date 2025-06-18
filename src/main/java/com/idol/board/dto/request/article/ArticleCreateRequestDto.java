@@ -21,8 +21,8 @@ public record ArticleCreateRequestDto(
         String imageKey,
         String description,
         SmallCategory smallCategory,
-        Timestamp date,
-        Timestamp deadline,
+        Long date,
+        Long deadline,
         int minPerson,
         int maxPerson
 ) {
@@ -33,6 +33,9 @@ public record ArticleCreateRequestDto(
             SmallCategory.AFTERPARTY_TYPE
     );
 
+    private Timestamp changeTimeStamp(Long time){
+        return new Timestamp(time * 1000); // 밀리초 단위로 변환
+    }
 
     public Article toEntity(Long writerId, Long locationId, String locationAddress) {
         return Article.builder()
@@ -43,8 +46,8 @@ public record ArticleCreateRequestDto(
                 .bigCategory(SPECIAL_CATEGORIES.contains(smallCategory) ? BigCategory.GO_TYPE : BigCategory.DOING_TYPE)
                 .smallCategory(smallCategory)
                 .description(description)
-                .date(date)
-                .deadline(deadline)
+                .date(changeTimeStamp(date))
+                .deadline(changeTimeStamp(deadline))
                 .minPerson(minPerson)
                 .maxPerson(maxPerson)
                 .articleImageKey(imageKey)

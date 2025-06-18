@@ -12,8 +12,8 @@ public record ArticleUpdateRequestDto(
         String imageKey,
         String description,
         SmallCategory smallCategory,
-        Timestamp date,
-        Timestamp deadline,
+        Long date,
+        Long deadline,
         Integer minPerson,
         Integer maxPerson
 ) {

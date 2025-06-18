@@ -15,9 +15,9 @@ public record ArticleListResponseDto(
     Long articleId,
     String title,
     String location,
-    Timestamp date,
-    Timestamp deadLine,
-    Timestamp createAt,
+    Long date,
+    Long deadLine,
+    Long createAt,
     int currentPerson,
     int maxPerson,
     OpenStatus openStatus,
@@ -26,14 +26,25 @@ public record ArticleListResponseDto(
     UseStatus useStatus
 ) {
 
+    public static Long changeToUnixTime(Timestamp ts) {
+        // 2. 밀리초 단위 UNIX timestamp 얻기
+        long unixMillis = ts.getTime(); // 1750288750000
+
+        // 3. 초 단위 UNIX timestamp 얻기
+        long unixSeconds = unixMillis / 1000; // 1750288750
+
+        return unixSeconds;
+    }
+
+
     public static ArticleListResponseDto from(ArticleListReadQueryResult searchArticle, String location, String imageUrl) {
         return ArticleListResponseDto.builder()
                 .articleId(searchArticle.articleId())
                 .title(searchArticle.title())
                 .location(location)
-                .date(searchArticle.date())
-                .deadLine(searchArticle.deadLine())
-                .createAt(Timestamp.valueOf(searchArticle.createAt()))
+                .date(changeToUnixTime(searchArticle.date()))
+                .deadLine(changeToUnixTime(searchArticle.deadLine()))
+                .createAt(changeToUnixTime(Timestamp.valueOf(searchArticle.createAt())))
                 .currentPerson(searchArticle.currentPerson())
                 .maxPerson(searchArticle.maxPerson())
                 .openStatus(searchArticle.openStatus())
