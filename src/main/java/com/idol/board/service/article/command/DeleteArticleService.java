@@ -2,8 +2,10 @@ package com.idol.board.service.article.command;
 
 import com.idol.board.domain.entity.Article;
 import com.idol.board.domain.entity.Comment;
+import com.idol.board.domain.entity.Participant;
 import com.idol.board.repository.article.ArticleRepository;
 import com.idol.board.repository.comment.CommentRepository;
+import com.idol.board.repository.fanFal.ParticipantRepository;
 import com.idol.board.repository.location.LocationRepository;
 import com.idol.board.usecase.article.command.DeleteArticleUseCase;
 import com.idol.global.exception.IllegalArgumentException;
@@ -24,6 +26,8 @@ public class DeleteArticleService implements DeleteArticleUseCase {
     private final ArticleRepository articleRepository;
     private final CommentRepository commentRepository;
     private final LocationRepository locationRepository;
+    private final ParticipantRepository participantRepository;
+
 
     @Override
     public Long delete(Long articleId, Long writerId){
@@ -43,13 +47,16 @@ public class DeleteArticleService implements DeleteArticleUseCase {
                     location.markAsDeleted();
                 });
 
+        participantRepository.findParticipantFromArticle(articleId).stream()
+                .forEach(participant -> participant.markAsDeleted());
         article.markAsDeleted();
+
 
         return articleId;
     }
 
     private void validateUserHasPermission(Article article, Long writerId) {
-        if (Long.compare(article.getWriterId(), writerId) == 0) {
+        if (article.getWriterId() != writerId) {
             throw new IllegalArgumentException("Article",article.getArticleId());
         }
     }
