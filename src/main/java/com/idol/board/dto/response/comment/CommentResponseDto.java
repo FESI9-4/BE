@@ -10,18 +10,32 @@ public record CommentResponseDto(
         Long parentCommentId,
         Long writerId,
         boolean deleted,
-        Timestamp createdAt,
-        boolean secret
+        Long createdAt,
+        boolean secret,
+        String nickName,
+        String writerImageUrl
 ) {
 
-    public static CommentResponseDto from(CommentReadQueryResult result){
+    public static Long changeToUnixTime(Timestamp ts) {
+        // 2. 밀리초 단위 UNIX timestamp 얻기
+        long unixMillis = ts.getTime(); // 1750288750000
+
+        // 3. 초 단위 UNIX timestamp 얻기
+        long unixSeconds = unixMillis / 1000; // 1750288750
+
+        return unixSeconds;
+    }
+
+    public static CommentResponseDto from(CommentReadQueryResult result,String nickName, String writerImageUrl) {
         return new CommentResponseDto(
                 result.commentId(),
                 result.content(),
                 result.parentCommentId(),
                 result.writerId(),
                 result.isDeleted(),
-                Timestamp.valueOf(result.createdAt()),
-                result.secret());
+                changeToUnixTime(Timestamp.valueOf(result.createdAt())),
+                result.secret(),
+                nickName,
+                writerImageUrl);
     }
 }
