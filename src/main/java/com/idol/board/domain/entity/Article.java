@@ -113,6 +113,19 @@ public class Article extends BaseEntity {
         this.openStatus = openStatus;
     }
 
+    public void updateUseStatus(UseStatus useStatus) {
+        this.useStatus = useStatus;
+    }
+
+    public void upCurrentPerson() {
+        this.currentPerson ++;
+    }
+
+    public void downCurrentPerson() {
+        this.currentPerson --;
+    }
+
+
     public void update(ArticleUpdateRequestDto requestDto) {
         Set<SmallCategory> SPECIAL_CATEGORIES = Set.of(
                 SmallCategory.BUSRENTAL_TYPE,
@@ -120,13 +133,15 @@ public class Article extends BaseEntity {
                 SmallCategory.AFTERPARTY_TYPE
         );
 
+
+
         if (requestDto.title() != null) this.title = requestDto.title();
         if (requestDto.description() != null) this.description = requestDto.description();
         if(requestDto.roadNameAddress() != null) this.locationAddress = requestDto.roadNameAddress();
         if (requestDto.smallCategory() != null) this.smallCategory = requestDto.smallCategory();
         if (requestDto.smallCategory() != null) this.bigCategory = SPECIAL_CATEGORIES.contains(smallCategory) ? BigCategory.GO_TYPE : BigCategory.DOING_TYPE;
-        if (requestDto.date() != null) this.date = requestDto.date();
-        if (requestDto.deadline() != null) this.deadline = requestDto.deadline();
+        if (requestDto.date() != null) this.date = new Timestamp(requestDto.date() * 1000);
+        if (requestDto.deadline() != null) this.deadline = new Timestamp(requestDto.deadline() *1000);
         if (requestDto.minPerson() != null) this.minPerson = requestDto.minPerson();
         if (requestDto.maxPerson() != null) this.maxPerson = requestDto.maxPerson();
         if (requestDto.imageKey() != null) this.articleImageKey = requestDto.imageKey();
