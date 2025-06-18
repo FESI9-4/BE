@@ -23,9 +23,7 @@ public class CommentController {
 
     @Operation(summary = "댓글 작성", description = "댓글 혹은 대댓글 작성합니다")
     @PostMapping("/{articleId}/comment")
-    public ApiResponse<Long>  createComment(@PathVariable Long articleId, @RequestBody CommentCreateRequestDto requestDto) {
-        // TODO :: UserId 연동
-        Long writerId = 12341L;
+    public ApiResponse<Long>  createComment(@PathVariable Long articleId, @RequestBody CommentCreateRequestDto requestDto, @MemberId Long writerId) {
         Long commentId = createCommentUseCase.createComment(requestDto, writerId, articleId);
 
         return ApiResponse.ok(commentId, "댓글 생성 성공");
@@ -33,18 +31,14 @@ public class CommentController {
 
     @Operation(summary = "댓글 삭제", description = "댓글 Soft Delete")
     @DeleteMapping("/{articleId}/comment/{commentId}")
-    public ApiResponse<Long> deleteComment(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentId") Long commentId) {
-        // TODO :: UserId 연동
-        Long writerId = 12341L;
+    public ApiResponse<Long> deleteComment(@PathVariable(name = "articleId") Long articleId, @PathVariable(name = "commentId") Long commentId, @MemberId Long writerId) {
         deleteCommentUseCase.delete(commentId,writerId);
         return ApiResponse.ok(commentId, "댓글 삭제 성공");
     }
 
     @Operation(summary = "댓글 수정", description = "댓글 수정")
     @PatchMapping("/{articleId}/comment")
-    public ApiResponse<Long>  updateComment(@PathVariable Long articleId, @RequestBody CommentUpdateRequestDto requestDto) {
-        // TODO :: UserId 연동
-        Long writerId = 12341L;
+    public ApiResponse<Long>  updateComment(@PathVariable Long articleId, @RequestBody CommentUpdateRequestDto requestDto, @MemberId Long writerId) {
         Long commentId = updateCommentUseCase.updateComment(requestDto,writerId);
 
         return ApiResponse.ok(commentId, "댓글 생성 성공");
