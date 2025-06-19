@@ -8,6 +8,8 @@ import com.idol.board.dto.response.comment.CommentResponseDto;
 import com.idol.board.usecase.article.query.ReadArticleUseCase;
 import com.idol.board.usecase.comment.query.ReadCommentUseCase;
 import com.idol.global.common.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,9 +19,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/board")
 @RequiredArgsConstructor
+@Tag(name = "게시글 Read API", description = "게시글 Read API")
 public class GetArticleController {
     private final ReadArticleUseCase readArticleUseCase;
 
+    @Operation(summary = "게시글 상세 페이지", description = "게시글 상세 페이지 출력")
     @GetMapping("/{articleId}")
     public ApiResponse<ArticleReadResponseDto> readArticle(@PathVariable Long articleId) {
 
@@ -29,6 +33,7 @@ public class GetArticleController {
     }
 
 
+    @Operation(summary = "게시글 리스트 출력", description = "카테고리, 지역, 날짜, 정렬 기준으로 게시글 리스트 출력")
     // /bigCategory?=go&smallCategory?=lentBus&location?=”seoul”&date?=1747361368&sort?=recent&sortAsc=true&lastArticleId?=151381421513&limit?=10
     @GetMapping()
     public ApiResponse<List<ArticleListResponseDto>> readAllArticle(
