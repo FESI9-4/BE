@@ -24,24 +24,12 @@ import java.util.Set;
 // 생성자마다 builder 사용
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Article extends BaseEntity {
-    // 정적 Snowflake 인스턴스
-    private static final Snowflake snowflake = new Snowflake();
 
-    @PrePersist
-    public void generateId() {
-        if (this.articleId == null) {
-            this.articleId = snowflake.nextId();
-        }
-    }
 
     @Id
     @Column(name = "article_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long articleId;
-
-    // TODO :: Member Table과 매핑
-    // Todo :: writerId가 있는데 굳이 userId도 필요한가?
-//    @Column(name = "user_id", nullable = false)
-//    private Long userId;
 
     // TODO :: UserId값 저장 (아이디 이름)
     @Column(name = "writer_id", nullable = false)

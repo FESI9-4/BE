@@ -16,6 +16,7 @@ public class Comment extends BaseEntity {
 
     @Id
     @Column(name = "comment_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
 
     @Column(name = "article_id", nullable = false)
@@ -41,6 +42,10 @@ public class Comment extends BaseEntity {
         this.content = content;
         this.parentCommentId = parentCommentId;
         this.secret = secret;
+    }
+
+    public void addCommentParentId(){
+        this.parentCommentId = this.getCommentId();
     }
 
     public boolean isRoot() {
