@@ -31,3 +31,12 @@ jwt:
   expiration: 3600000
   refresh-expiration: 604800000
 
+cloud:
+  aws:
+    s3:
+      bucket: codit-project # 버킷 이름
+    stack.auto: false
+    region.static: ap-northeast-2 # 버킷 리전
+    credentials:
+      access-key: test1234
+      secret-key: test1234
