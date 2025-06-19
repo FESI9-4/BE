@@ -2,6 +2,7 @@ package com.idol.domains.member.domain;
 
 import com.idol.domains.member.dto.request.SignupMemberRequestDto;
 import com.idol.global.common.entity.BaseEntity;
+import com.idol.global.common.snowflake.Snowflake;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -15,12 +16,17 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name = "member")
 public class Member extends BaseEntity {
 
+    // 정적 Snowflake 인스턴스
+    private static final Snowflake snowflake = new Snowflake();
+
+    @PrePersist
+    public void generateId() {
+        if (this.memberId == null) {
+            this.memberId = snowflake.nextId();
+        }
+    }
+
     @Id
-    @GeneratedValue(generator = "snowflake")
-    @GenericGenerator(
-            name = "snowflake-id",
-            strategy = "com.idol.global.common.snowflake.SnowflakeIdGenerator"
-    )
     @Column(name = "member_id", nullable = false)
     private Long memberId;
 
