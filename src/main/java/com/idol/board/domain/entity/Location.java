@@ -15,7 +15,6 @@ import org.hibernate.annotations.*;
 @NoArgsConstructor
 public class Location extends BaseEntity {
 
-
     @Id
     @Column(name = "location_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -24,6 +24,16 @@ import java.util.Set;
 @Table(name = "member")
 public class Member extends BaseEntity {
 
+    // 정적 Snowflake 인스턴스
+    private static final Snowflake snowflake = new Snowflake();
+
+    @PrePersist
+    public void generateId() {
+        if (this.memberId == null) {
+            this.memberId = snowflake.nextId();
+        }
+    }
+
     @Id
     @Column(name = "member_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
