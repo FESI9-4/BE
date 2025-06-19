@@ -12,13 +12,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class CreateCommentService implements CreateCommentUseCase {
     private final ArticleRepository articleRepository;
     private final CommentRepository commentRepository;
-    private final Snowflake snowflake = new Snowflake();        // 대댓글 판단을 위해 service에서 사용
 
     @Override
     public Long createComment(CommentCreateRequestDto requestDto, Long writerId, Long articleId) {
@@ -30,11 +31,14 @@ public class CreateCommentService implements CreateCommentUseCase {
 
         Comment comment = commentRepository.save(
                 requestDto.toEntity(
-                        snowflake.nextId(),
                         article.getArticleId(),
                         writerId,
                         parent == null ? null : parent.getCommentId()
                 ));
+
+        if(parent == null){
+            comment.addCommentParentId();
+        }
 
         return comment.getCommentId();
     }

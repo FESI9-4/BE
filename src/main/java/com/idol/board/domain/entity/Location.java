@@ -15,18 +15,9 @@ import org.hibernate.annotations.*;
 @NoArgsConstructor
 public class Location extends BaseEntity {
 
-    // 정적 Snowflake 인스턴스
-    private static final Snowflake snowflake = new Snowflake();
-
-    @PrePersist
-    public void generateId() {
-        if (this.locationId == null) {
-            this.locationId = snowflake.nextId();
-        }
-    }
-
     @Id
     @Column(name = "location_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long locationId;
 
     @Column(name = "latitude", nullable = false)
