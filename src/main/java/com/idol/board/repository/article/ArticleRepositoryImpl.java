@@ -4,7 +4,6 @@ import com.idol.board.domain.BigCategory;
 import com.idol.board.domain.SmallCategory;
 import com.idol.board.domain.entity.Article;
 import com.idol.board.domain.entity.QArticle;
-import com.idol.board.dto.response.article.ArticleListResponseDto;
 import com.idol.board.repository.mapper.ArticleListReadQueryResult;
 import com.idol.board.repository.mapper.CommentReadQueryResult;
 import com.querydsl.core.types.Order;
@@ -69,35 +68,6 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
                 .fetch();
     }
 
-
-    @Override
-    public List<ArticleListReadQueryResult> findMyPageArticle(Long userId, Long limit, Long offset) {
-        return queryFactory
-                .select(Projections.constructor(ArticleListReadQueryResult.class,
-                        article.articleId,
-                        article.title,
-                        article.locationId,
-                        article.articleImageKey,
-                        article.date,
-                        article.deadline,
-                        article.createdAt,
-                        article.currentPerson,
-                        article.maxPerson,
-                        article.openStatus,
-                        article.useStatus))
-                .from(article)
-                .where(
-                        article.isDeleted.eq(false),
-                        eqWriterId(userId)
-                )
-                .limit(limit)
-                .offset(offset)
-                .fetch();
-    }
-
-    private BooleanExpression eqWriterId(Long userId) {
-        return userId != null ? article.writerId.eq(userId) : null;
-    }
 
     private BooleanExpression eqBigCategory(BigCategory bigCategory) {
         return bigCategory != null ? article.bigCategory.eq(bigCategory) : null;

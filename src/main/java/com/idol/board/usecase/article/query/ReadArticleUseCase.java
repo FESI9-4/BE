@@ -15,6 +15,4 @@ public interface ReadArticleUseCase {
     ArticleReadResponseDto readArticle(Long articleId);
 
     List<ArticleListResponseDto> searchArticleList(BigCategory bigCategory, SmallCategory smallCategory, String location, Timestamp date, String sort, boolean sortAsc, Long limit, Long page);
-
-    List<ArticleListResponseDto> searchMypageList(Long limit, Long page, Long userId);
 }
