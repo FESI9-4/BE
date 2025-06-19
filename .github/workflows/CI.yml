@@ -24,6 +24,10 @@ jobs:
       REDIS_HOST: localhost
       REDIS_PORT: 6379
       TESTCONTAINERS_REUSE_ENABLE: true
+      ACCESS_KEY: ${{secrets.ACCESS_KEY}}
+      SECRET_KEY: ${{secrets.SECRET_KEY}}
+      BUCKET: ${{secrets.BUCKET}}
+      REGION: ${{secrets.REGION}}
 
     steps:
       - name: Github Repository 파일 불러오기

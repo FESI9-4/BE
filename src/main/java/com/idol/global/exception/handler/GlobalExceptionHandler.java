@@ -1,14 +1,14 @@
 package com.idol.global.exception.handler;
 
-import com.idol.global.exception.AuthenticationException;
-import com.idol.global.exception.BadRequestException;
-import com.idol.global.exception.ConflictException;
+import com.idol.global.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.lang.IllegalArgumentException;
 
 @RestControllerAdvice
 @Slf4j
@@ -47,6 +47,36 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    ProblemDetail handleNotFoundException(final NotFoundException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+
+        // 리소스 타입에 따라 다른 제목 설정
+        String title = switch (e.getResourceName()) {
+            case "Article" -> "게시물을 찾을 수 없습니다";
+            case "Comment" -> "댓글을 찾을 수 없습니다";
+            default -> "리소스를 찾을 수 없습니다";
+        };
+
+        problemDetail.setTitle(title);
+        return problemDetail;
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    ProblemDetail handleUserHasPermissionException(final NotFoundException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+
+        // 리소스 타입에 따라 다른 제목 설정
+        String title = switch (e.getResourceName()) {
+            case "Article" -> "해당 게시물에 접근 권한이 없습니다";
+            case "Comment" -> "해당 댓글에 접근 권한이 없습니다";
+            default -> "리소스를 찾을 수 없습니다";
+        };
+
+        problemDetail.setTitle(title);
+        return problemDetail;
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ProblemDetail handleMethodArgumentNotValid(final MethodArgumentNotValidException e) {
 
@@ -55,6 +85,15 @@ public class GlobalExceptionHandler {
 
         problemDetail.setTitle("유효성 검증 실패");
 
+        return problemDetail;
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    ProblemDetail handleEnoughException(final ForbiddenException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
+
+
+        problemDetail.setTitle("현재 인원이 가득 찼습니다");
         return problemDetail;
     }
 

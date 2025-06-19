@@ -36,7 +36,7 @@ server:
 springdoc:
   api-docs:
     path: /v3/api-docs
-    enabled: true       
+    enabled: true
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
@@ -54,3 +54,14 @@ management:
     web:
       exposure:
         include: health, prometheus
+
+cloud:
+  aws:
+    s3:
+      bucket: ${BUCKET_NAME} # 버킷 이름
+    stack.auto: false
+    region.static: ${REGION} # 버킷 리전
+    credentials:
+      access-key: ${ACCESS_KEY}
+      secret-key: ${SECRET_KEY}
+
