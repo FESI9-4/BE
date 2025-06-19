@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,7 +49,7 @@ public class ReadArticleService implements ReadArticleUseCase {
 
         List<Participant> participant = participantRepository.findParticipantFromArticle(articleId);
 
-        List<ParticipantResponseDto> participants = new ArrayList<>();
+        List<ParticipantResponseDto> participants = null;
 
         if(!participant.isEmpty()){
             for(Participant p : participant){
@@ -104,20 +103,6 @@ public class ReadArticleService implements ReadArticleUseCase {
                 .collect(Collectors.toList());
 
         return searchArticles;
-    }
-
-    @Override
-    public List<ArticleListResponseDto> searchMypageList(Long limit, Long page, Long userId) {
-        List<ArticleListResponseDto> searchMyPageList = articleRepository.findMyPageArticle(userId, limit, (page -1) * limit)
-                .stream().map(result ->
-                        ArticleListResponseDto.from(
-                                result,
-                                validateLocation(result.locationId()).getRoadNameAddress(),
-                                getS3Url(result.imageKey()).preSignedUrl()
-                        ))
-                .collect(Collectors.toList());
-
-        return searchMyPageList;
     }
 
     private void validateCheckOpenStatus(Article article) {

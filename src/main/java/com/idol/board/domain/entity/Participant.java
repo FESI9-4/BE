@@ -26,7 +26,6 @@ public class Participant extends BaseEntity {
 
     @Id
     @Column(name = "participant_id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long participantId;
 
     @Column(name = "article_id", nullable = false)

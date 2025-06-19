@@ -1,10 +1,5 @@
 package com.idol.domains.member.domain;
 
-import com.idol.board.domain.BigCategory;
-import com.idol.board.domain.SmallCategory;
-import com.idol.board.dto.request.article.ArticleUpdateRequestDto;
-import com.idol.board.dto.request.myPage.MyPageUpdateRequestDto;
-import com.idol.board.service.myPage.command.UpdateMyPageService;
 import com.idol.domains.member.dto.request.SignupMemberRequestDto;
 import com.idol.global.common.entity.BaseEntity;
 import com.idol.global.common.snowflake.Snowflake;
@@ -14,9 +9,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
-
-import java.sql.Timestamp;
-import java.util.Set;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -36,7 +28,6 @@ public class Member extends BaseEntity {
 
     @Id
     @Column(name = "member_id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
 
     @Column(name = "email", nullable = false)
@@ -50,11 +41,6 @@ public class Member extends BaseEntity {
 
     @Column(name = "profile_img_url", nullable = false)
     private String profileImgUrl;
-
-
-    @Column(name = "information", nullable = true)
-    private String information;
-
 
     public static Member from(SignupMemberRequestDto requestDto, String encryptedPassword) {
         return Member.builder()
@@ -70,13 +56,5 @@ public class Member extends BaseEntity {
         this.password = password;
         this.nickname = nickname;
         this.profileImgUrl = "";
-    }
-
-
-    public void update(MyPageUpdateRequestDto dto, String encryptedPassword) {
-        if(dto.nickName() != null) this.nickname = dto.nickName();
-        if(dto.information() != null) this.information = dto.information();
-        if(dto.profileImgUrl() != null) this.profileImgUrl = dto.profileImgUrl();
-        if(encryptedPassword != null) this.password = encryptedPassword;
     }
 }

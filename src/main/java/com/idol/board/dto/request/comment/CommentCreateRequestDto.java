@@ -10,12 +10,13 @@ public record CommentCreateRequestDto(
         boolean secret
 ) {
 
-    public Comment toEntity(Long articleId, Long writerId, Long parentCommentId) {
+    public Comment toEntity(Long commentId, Long articleId, Long writerId, Long parentCommentId) {
         return Comment.builder()
+                .commentId(commentId)
                 .articleId(articleId)
                 .writerId(writerId)
                 .content(this.content)
-                .parentCommentId(parentCommentId == null ? 0L : parentCommentId)
+                .parentCommentId(parentCommentId == null ? commentId : parentCommentId)
                 .secret(this.secret)
                 .build();
     }
