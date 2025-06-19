@@ -2,6 +2,7 @@ package com.idol.board.domain.entity;
 
 import com.idol.board.dto.request.article.ArticleUpdateRequestDto;
 import com.idol.global.common.entity.BaseEntity;
+import com.idol.global.common.snowflake.Snowflake;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.*;
@@ -14,9 +15,17 @@ import org.hibernate.annotations.*;
 @NoArgsConstructor
 public class Location extends BaseEntity {
 
+    // 정적 Snowflake 인스턴스
+    private static final Snowflake snowflake = new Snowflake();
+
+    @PrePersist
+    public void generateId() {
+        if (this.locationId == null) {
+            this.locationId = snowflake.nextId();
+        }
+    }
+
     @Id
-    @GeneratedValue(generator = "snowflake-id")
-    @GenericGenerator(name = "snowflake-id", strategy = "com.idol.global.common.snowflake.SnowflakeIdGenerator")
     @Column(name = "location_id", nullable = false)
     private Long locationId;
 

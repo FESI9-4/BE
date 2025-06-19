@@ -2,6 +2,7 @@ package com.idol.board.domain.entity;
 
 import com.idol.board.domain.UseStatus;
 import com.idol.global.common.entity.BaseEntity;
+import com.idol.global.common.snowflake.Snowflake;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -13,9 +14,17 @@ import org.hibernate.annotations.GenericGenerator;
 // 생성자마다 builder 사용
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Participant extends BaseEntity {
+    // 정적 Snowflake 인스턴스
+    private static final Snowflake snowflake = new Snowflake();
+
+    @PrePersist
+    public void generateId() {
+        if (this.participantId == null) {
+            this.participantId = snowflake.nextId();
+        }
+    }
+
     @Id
-    @GeneratedValue(generator = "snowflake-id")
-    @GenericGenerator(name = "snowflake-id", strategy = "com.idol.global.common.snowflake.SnowflakeIdGenerator")
     @Column(name = "participant_id", nullable = false)
     private Long participantId;
 

@@ -6,6 +6,7 @@ import com.idol.board.domain.SmallCategory;
 import com.idol.board.domain.UseStatus;
 import com.idol.board.dto.request.article.ArticleUpdateRequestDto;
 import com.idol.global.common.entity.BaseEntity;
+import com.idol.global.common.snowflake.Snowflake;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.*;
@@ -23,10 +24,17 @@ import java.util.Set;
 // 생성자마다 builder 사용
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Article extends BaseEntity {
+    // 정적 Snowflake 인스턴스
+    private static final Snowflake snowflake = new Snowflake();
+
+    @PrePersist
+    public void generateId() {
+        if (this.articleId == null) {
+            this.articleId = snowflake.nextId();
+        }
+    }
 
     @Id
-    @GeneratedValue(generator = "snowflake-id")
-    @GenericGenerator(name = "snowflake-id", strategy = "com.idol.global.common.snowflake.SnowflakeIdGenerator")
     @Column(name = "article_id", nullable = false)
     private Long articleId;
 
