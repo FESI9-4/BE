@@ -51,7 +51,7 @@ public class SecurityConfig {
                                 "/fanfal/api-docs",
                                 "/actuator/**"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/board/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/board").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/board/*/comment").permitAll()
                         .anyRequest().authenticated()
                 )
