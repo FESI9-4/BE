@@ -54,11 +54,11 @@ public class ReadArticleService implements ReadArticleUseCase {
 
         if(!participant.isEmpty()){
             for(Participant p : participant){
-                GetS3UrlDto getS3UrlDto = null;
-                if(p.getImageKey() != null){
-                    getS3UrlDto = getS3Url(p.getImageKey());
+                String participantImageUrl = "";
+                if(!p.getImageKey().equals("")){
+                    participantImageUrl = getS3Url(p.getImageKey()).preSignedUrl();
                 }
-                ParticipantResponseDto pa = new ParticipantResponseDto(getS3UrlDto == null ? null : getS3UrlDto.preSignedUrl(), p.getNickname());
+                ParticipantResponseDto pa = new ParticipantResponseDto(participantImageUrl, p.getNickname());
                     participants.add(pa);
             }
         }
@@ -66,13 +66,13 @@ public class ReadArticleService implements ReadArticleUseCase {
         /* TODO::
            2. 현재 게시물 찜되어 있는지 확인
          */
-        GetS3UrlDto getS3UrlDto = null;
-        if(article.getArticleImageKey() != null){
-            getS3UrlDto = getS3Url(article.getArticleImageKey());
+        String articleImageUrl = "";
+        if(!article.getArticleImageKey().equals("")){
+            articleImageUrl = getS3Url(article.getArticleImageKey()).preSignedUrl();
         }
 
-        String writerImageUrl = null;
-        if(member.getProfileImgUrl() != null){
+        String writerImageUrl = "";
+        if(!member.getProfileImgUrl().equals("")){
             writerImageUrl = getS3Url(member.getProfileImgUrl()).preSignedUrl();
         }
 
@@ -81,7 +81,7 @@ public class ReadArticleService implements ReadArticleUseCase {
 
         validateCheckOpenStatus(article);
 
-        ArticleReadResponseDto dto = ArticleReadResponseDto.from(article,location,participants,true,getS3UrlDto.preSignedUrl(),member.getNickname(),writerImageUrl);
+        ArticleReadResponseDto dto = ArticleReadResponseDto.from(article,location,participants,true,articleImageUrl,member.getNickname(),writerImageUrl);
 
         return dto;
     }
@@ -91,15 +91,21 @@ public class ReadArticleService implements ReadArticleUseCase {
     @Transactional(readOnly = true)
     public List<ArticleListResponseDto> searchArticleList(
             BigCategory bigCategory, SmallCategory smallCategory, String location,
-            Timestamp date, String sort, boolean sortAsc, Long limit, Long page) {
+            Long date, String sort, boolean sortAsc, Long limit, Long page) {
+
+        Timestamp dateTime = null;
+        if (date != null) {
+            dateTime =  new Timestamp(date * 1000);
+        }
 
         List<ArticleListResponseDto> searchArticles = articleRepository.findArticleList(
-                bigCategory, smallCategory, location, date, sort,  sortAsc, limit,  (page -1) * limit).stream()
+                bigCategory, smallCategory, location, dateTime, sort,  sortAsc, limit,  (page -1) * limit).stream()
                 .map(result ->
                         ArticleListResponseDto.from(
                                 result,
                                 validateLocation(result.locationId()).getRoadNameAddress(),
-                                getS3Url(result.imageKey()).preSignedUrl()
+                                result.imageKey().equals("")? "" : getS3Url(result.imageKey()).preSignedUrl()
+//                                getS3Url(result.imageKey()).preSignedUrl()
                         ))
                 .collect(Collectors.toList());
 
