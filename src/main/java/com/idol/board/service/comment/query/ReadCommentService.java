@@ -34,8 +34,8 @@ public class ReadCommentService implements ReadCommentUseCase {
 
         for(CommentReadQueryResult result : comments){
             Member member = memberJpaRepository.findById(result.writerId()).orElseThrow(() -> new NotFoundException("Member", result.writerId()));
-            String writerImageUrl = null;
-            if(member.getProfileImgUrl() != null){
+            String writerImageUrl = "";
+            if(!member.getProfileImgUrl().equals("")){
                 writerImageUrl = getS3Url(member.getProfileImgUrl()).preSignedUrl();
             }
 
