@@ -40,7 +40,7 @@ public class GetArticleController {
             @RequestParam(value = "bigCategory", required=false)BigCategory bigCategory,
             @RequestParam(value = "smallCategory", required=false)SmallCategory smallCategory,
             @RequestParam(value = "location", required=false)String location,
-            @RequestParam(value = "date", required=false) Timestamp date,
+            @RequestParam(value = "date", required=false) Long date,
             @RequestParam(value = "sort", required=false)String sort,
             @RequestParam(value = "sortAsc", required=false)boolean sortAsc,                // true : ASC, false : DESC
             @RequestParam(value = "limit")Long limit,
