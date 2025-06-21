@@ -20,4 +20,7 @@ public interface ArticleRepositoryCustom {
             Timestamp date, String sort, boolean sortAsc, Long limit, Long offset);
 
     List<ArticleListReadQueryResult> findMyPageArticle(Long userId, Long limit, Long offset);
+
+    List<ArticleListReadQueryResult> findJoinMyPageArticle(List<Long> articleIds, Long limit, Long offset);
+
 }
