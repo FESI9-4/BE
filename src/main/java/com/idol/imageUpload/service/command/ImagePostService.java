@@ -26,8 +26,8 @@ public class ImagePostService implements ImageUploadUseCase {
 
     // S3에 이미지 업로드 주소 URL 요청
     @Override
-    public GetS3UrlDto getPostS3Url(Long userId, String fileName) {
-        String key = "profile/" + userId + "/" + UUID.randomUUID() + "/" + fileName;
+    public GetS3UrlDto getPostS3Url(String fileName) {
+        String key = "profile/" + UUID.randomUUID() + "/" + fileName;
 
         // PutObjectRequest: S3에 객체를 업로드하기 위한 요청
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
