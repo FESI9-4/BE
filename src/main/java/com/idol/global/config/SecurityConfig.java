@@ -54,6 +54,7 @@ public class SecurityConfig {
                                 "/api/images/"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/board").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/board/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/board/*/comment").permitAll()
                         .anyRequest().authenticated()
                 )
