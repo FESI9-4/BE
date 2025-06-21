@@ -9,4 +9,6 @@ public interface ParticipantRepositoryCustom {
     Optional<Participant> findParticipant(Long articleId, Long writerId);
 
     List<Participant> findParticipantFromArticle(Long articleId);
+
+    List<Participant> findParticipantFromWriterId(Long writerId);
 }

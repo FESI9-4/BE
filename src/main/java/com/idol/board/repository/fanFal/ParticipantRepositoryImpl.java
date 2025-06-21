@@ -46,4 +46,14 @@ public class ParticipantRepositoryImpl implements ParticipantRepositoryCustom{
                 ).fetch();
     }
 
+    @Override
+    public List<Participant> findParticipantFromWriterId(Long writerId) {
+        return queryFactory
+                .selectFrom(participant)
+                .where(
+                        participant.isDeleted.eq(false),
+                        participant.writerId.eq(writerId)
+                ).fetch();
+    }
+
 }

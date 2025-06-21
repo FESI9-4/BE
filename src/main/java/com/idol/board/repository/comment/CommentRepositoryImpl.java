@@ -3,8 +3,10 @@ package com.idol.board.repository.comment;
 import com.idol.board.domain.entity.Comment;
 import com.idol.board.domain.entity.QComment;
 import com.idol.board.repository.mapper.CommentReadQueryResult;
+import com.idol.board.repository.mapper.CommentReadQuestionQueryResult;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -40,19 +42,6 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
     }
 
 
-//    @Override
-//    public Optional<Comment> findByParentCommentId(Long parentCommentId) {
-//        String sql = "select a from Comment a where a.isDeleted = false and a.parentCommentId = :parentCommentId";
-//        Query query = entityManager.createQuery(sql)
-//                .setParameter("parentCommentId", parentCommentId);
-//        try {
-//            return Optional.ofNullable((Comment) query.getSingleResult());
-//        } catch (NoResultException e) {
-//            return Optional.empty();
-//        }
-//    }
-
-
     @Override
     public Optional<Comment> findByParentCommentId(Long parentCommentId) {
 
@@ -67,24 +56,6 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
         );
     }
 
-    // 연관된 댓글 개수 확인
-//    @Override
-//    public Long relatedCommentCountBy(Long articleId, Long parentCommentId, Long limit) {
-//        String sql = "select count(*) from(" +
-//                "   select comment_id from comment" +
-//                "   where is_deleted = false and article_id = :articleId and parent_comment_id = :parentCommentId" +
-//                "   limit :limit" +
-//                ") t";
-//
-//        Query query = entityManager.createNativeQuery(sql)
-//                .setParameter("articleId", articleId)
-//                .setParameter("parentCommentId", parentCommentId)
-//                .setParameter("limit", limit);
-//
-//
-//        log.info(String.valueOf(((Number) query.getSingleResult()).longValue()));
-//        return ((Number) query.getSingleResult()).longValue();
-//    }
 
     @Override
     public Long relatedCommentCountBy(Long articleId, Long parentCommentId, Long limit) {
@@ -163,4 +134,46 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
                 .limit(limit)
                 .fetch();
     }
+
+
+//    @Override
+//    public List<CommentReadQuestionQueryResult> findQuestionAllInfiniteScroll(Long userId, Long limit) {
+//
+//        return queryFactory
+//                .select(Projections.constructor(CommentReadQuestionQueryResult.class,
+//                        comment.commentId,
+//                        comment.articleId,
+//                        comment.content,
+//                        comment.parentCommentId,
+//                        comment.writerId,
+//                        comment.isDeleted,
+//                        comment.createdAt,
+//                        comment.secret))
+//                .from(comment)
+//                .where(
+//                        comment.isDeleted.eq(false),
+//                        comment.writerId.eq(userId).and(comment.parentCheck.eq(true))  // 부모 댓글
+//                                .or(
+//                                        comment.parentCommentId.in(
+//                                                JPAExpressions
+//                                                        .select(comment.commentId)
+//                                                        .from(comment)
+//                                                        .where(
+//                                                                comment.isDeleted.eq(false),
+//                                                                comment.writerId.eq(userId),
+//                                                                comment.parentCheck.eq(true)
+//                                                        )
+//                                        )  // 자식 댓글
+//                                )
+//                )
+//                .orderBy(
+//                        comment.parentCommentId.asc().nullsFirst(),  // 부모 댓글 먼저
+//                        comment.parentCheck.desc(),                  // 부모 댓글 먼저
+//                        comment.createdAt.asc()
+//                )
+////                .limit(limit * 10)
+////                .offset(offset)
+//                .fetch();
+//    }
+
 }
