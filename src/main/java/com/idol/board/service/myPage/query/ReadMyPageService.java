@@ -17,6 +17,7 @@ import com.idol.board.repository.mapper.CommentReadQuestionQueryResult;
 import com.idol.board.usecase.mypage.query.ReadMyPageUseCase;
 import com.idol.domains.member.domain.Member;
 import com.idol.domains.member.repository.MemberJpaRepository;
+import com.idol.domains.wish.usecase.CountWishUsecase;
 import com.idol.global.exception.NotFoundException;
 import com.idol.imageUpload.dto.GetS3UrlDto;
 import com.idol.imageUpload.useCase.ImageGetUserCase;
@@ -36,6 +37,7 @@ public class ReadMyPageService implements ReadMyPageUseCase {
     private final ParticipantRepository participantRepository;
     private final CommentRepository commentJpaRepository;
     private final MemberJpaRepository memberJpaRepository;
+    private final CountWishUsecase countWishUsecase;
 
     @Override
     public List<ArticleListResponseDto> readMypageList(Long limit, Long page, Long userId) {
@@ -76,8 +78,13 @@ public class ReadMyPageService implements ReadMyPageUseCase {
         Member member = memberJpaRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Member", userId));
 
-        UserDataResponseDto responseDto = UserDataResponseDto.from(member,getS3Url(member.getProfileImgUrl()),0);
+        Long wishCount = countWishUsecase.countWishesByMemberId(userId);
 
+        UserDataResponseDto responseDto = UserDataResponseDto.from(
+                member,
+                getS3Url(member.getProfileImgUrl()),
+                wishCount.intValue()
+        );
         return responseDto;
     }
 
