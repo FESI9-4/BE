@@ -46,6 +46,13 @@ public class ArticleController {
         return ApiResponse.ok(updatedArticleId, "게시글 수정 성공");
     }
 
+    @Operation(summary = "게시글 모집 취소", description = "게시글 모집 취소")
+    @PatchMapping("/{articleId}/statusClose")
+    public ApiResponse<Long> updateArticleClose(@PathVariable Long articleId, @MemberId Long writerId) {
+        Long updatedArticleId = updateArticleUserCase.updateOpenStatusClose(articleId, writerId);
+        return ApiResponse.ok(updatedArticleId, "게시글 모집 취소");
+    }
+
 
     @Operation(summary = "펜팔 참여", description = "펜팔 참여")
     @PostMapping("/{articleId}/fanFal")
@@ -60,5 +67,6 @@ public class ArticleController {
         Long fanFalId = participantUseCase.cancelFanFal(articleId, writerId);
         return ApiResponse.ok(fanFalId, "펜팔 취소 성공");
     }
+
 
 }

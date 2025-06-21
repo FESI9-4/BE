@@ -49,9 +49,12 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/fanfal/api-docs",
-                                "/actuator/**"
+                                "/actuator/**",
+                                "/api/images/**",
+                                "/api/images/"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/board").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/board/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/board/*/comment").permitAll()
                         .anyRequest().authenticated()
                 )

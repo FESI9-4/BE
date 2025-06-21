@@ -1,7 +1,9 @@
 package com.idol.board.repository.article;
 
 import com.idol.board.domain.BigCategory;
+import com.idol.board.domain.OpenStatus;
 import com.idol.board.domain.SmallCategory;
+import com.idol.board.domain.UseStatus;
 import com.idol.board.domain.entity.Article;
 import com.idol.board.domain.entity.QArticle;
 import com.idol.board.dto.response.article.ArticleListResponseDto;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -93,6 +96,32 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
                 .limit(limit)
                 .offset(offset)
                 .fetch();
+    }
+
+    @Override
+    public List<ArticleListReadQueryResult> findJoinMyPageArticle(List<Long> articleIds, Long limit, Long offset) {
+            return queryFactory
+                    .select(Projections.constructor(ArticleListReadQueryResult.class,
+                        article.articleId,
+                        article.title,
+                        article.locationId,
+                        article.articleImageKey,
+                        article.date,
+                        article.deadline,
+                        article.createdAt,
+                        article.currentPerson,
+                        article.maxPerson,
+                        article.openStatus,
+                        article.useStatus))
+
+                    .from(article)
+                    .where(
+                            article.isDeleted.eq(false),
+                            article.articleId.in(articleIds)
+                    )
+                    .limit(limit)
+                    .offset(offset)
+                    .fetch();
     }
 
     private BooleanExpression eqWriterId(Long userId) {

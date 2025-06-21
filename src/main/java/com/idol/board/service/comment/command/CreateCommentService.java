@@ -38,6 +38,7 @@ public class CreateCommentService implements CreateCommentUseCase {
 
         if(parent == null){
             comment.addCommentParentId();
+//            comment.updateParentCheck();
         }
 
         return comment.getCommentId();

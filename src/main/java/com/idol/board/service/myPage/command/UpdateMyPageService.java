@@ -1,10 +1,9 @@
 package com.idol.board.service.myPage.command;
 
 import com.idol.board.dto.request.myPage.MyPageUpdateRequestDto;
-import com.idol.board.usecase.mypage.UpdateMyPageUseCase;
+import com.idol.board.usecase.mypage.command.UpdateMyPageUseCase;
 import com.idol.domains.member.domain.Member;
 import com.idol.domains.member.repository.MemberJpaRepository;
-import com.idol.domains.member.repository.MemberRepository;
 import com.idol.global.exception.NotFoundException;
 import com.idol.global.util.PasswordEncryptor;
 import lombok.RequiredArgsConstructor;

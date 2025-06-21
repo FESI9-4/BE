@@ -1,5 +1,6 @@
 package com.idol.board.service.article.command;
 
+import com.idol.board.domain.OpenStatus;
 import com.idol.board.domain.entity.Article;
 import com.idol.board.domain.entity.Location;
 import com.idol.board.dto.request.article.ArticleUpdateRequestDto;
@@ -27,7 +28,6 @@ public class UpdateArticleService implements UpdateArticleUseCase {
     @Override
     public Long updateArticle(ArticleUpdateRequestDto requestDto, Long writerId, Long articleId) {
         Article article = articleRepository.findByArticleId(articleId)
-                .filter(not(Article::getIsDeleted))
                 .orElseThrow(() -> new NotFoundException("Article", articleId));
 
         validateUserHasPermission(article, writerId);
@@ -41,6 +41,18 @@ public class UpdateArticleService implements UpdateArticleUseCase {
 
         location.update(requestDto);
         return article.getArticleId();
+    }
+
+    @Override
+    public Long updateOpenStatusClose(Long writerId, Long articleId) {
+        Article article = articleRepository.findByArticleId(articleId)
+                .orElseThrow(() -> new NotFoundException("Article", articleId));
+
+        if(article.getWriterId() == writerId){
+            article.updateOpenStatus(OpenStatus.CANCELED_STATUS);
+        }
+
+        return 0L;
     }
 
     private void validateUserHasPermission(Article article, Long writerId) {
