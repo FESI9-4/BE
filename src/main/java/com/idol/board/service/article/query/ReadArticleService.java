@@ -112,19 +112,7 @@ public class ReadArticleService implements ReadArticleUseCase {
         return searchArticles;
     }
 
-    @Override
-    public List<ArticleListResponseDto> searchMypageList(Long limit, Long page, Long userId) {
-        List<ArticleListResponseDto> searchMyPageList = articleRepository.findMyPageArticle(userId, limit, (page -1) * limit)
-                .stream().map(result ->
-                        ArticleListResponseDto.from(
-                                result,
-                                validateLocation(result.locationId()).getRoadNameAddress(),
-                                getS3Url(result.imageKey()).preSignedUrl()
-                        ))
-                .collect(Collectors.toList());
 
-        return searchMyPageList;
-    }
 
     private void validateCheckOpenStatus(Article article) {
         if(article.getCurrentPerson() >= article.getMinPerson()){
