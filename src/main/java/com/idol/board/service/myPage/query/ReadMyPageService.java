@@ -1,17 +1,22 @@
 package com.idol.board.service.myPage.query;
 
 import com.idol.board.domain.entity.Article;
+import com.idol.board.domain.entity.Comment;
 import com.idol.board.domain.entity.Location;
 import com.idol.board.domain.entity.Participant;
 import com.idol.board.dto.response.article.ArticleListResponseDto;
 import com.idol.board.dto.response.comment.CommentQuestionResponseDto;
 import com.idol.board.dto.response.comment.CommentResponseDto;
 import com.idol.board.dto.response.mypage.MyPageQuestionResponseDto;
+import com.idol.board.dto.response.mypage.UserAnswerResponseDto;
+import com.idol.board.dto.response.mypage.UserAnswerTotalResponseDto;
 import com.idol.board.dto.response.mypage.UserDataResponseDto;
 import com.idol.board.repository.article.ArticleRepository;
 import com.idol.board.repository.comment.CommentRepository;
 import com.idol.board.repository.fanFal.ParticipantRepository;
 import com.idol.board.repository.location.LocationRepository;
+import com.idol.board.repository.mapper.ArticleReadAnswerQueryResult;
+import com.idol.board.repository.mapper.CommentReadAnswerQueryResult;
 import com.idol.board.repository.mapper.CommentReadQueryResult;
 import com.idol.board.repository.mapper.CommentReadQuestionQueryResult;
 import com.idol.board.usecase.mypage.query.ReadMyPageUseCase;
@@ -22,6 +27,7 @@ import com.idol.global.exception.NotFoundException;
 import com.idol.imageUpload.dto.GetS3UrlDto;
 import com.idol.imageUpload.useCase.ImageGetUserCase;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,12 +36,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReadMyPageService implements ReadMyPageUseCase {
     private final ArticleRepository articleRepository;
     private final LocationRepository locationRepository;
     private final ImageGetUserCase imageGetUserCase;
     private final ParticipantRepository participantRepository;
-    private final CommentRepository commentJpaRepository;
+    private final CommentRepository commentRepository;
     private final MemberJpaRepository memberJpaRepository;
     private final CountWishUsecase countWishUsecase;
 
@@ -88,31 +95,43 @@ public class ReadMyPageService implements ReadMyPageUseCase {
         return responseDto;
     }
 
-//    @Override
-//    public MyPageQuestionResponseDto readMyQuestion(Long userId, Long lastParentCommentId, Long lastCommentId, Long limit) {
-//
-//        // 답변 대기
-//        List<CommentReadQuestionQueryResult> comments = commentJpaRepository.findQuestionAllInfiniteScroll(userId, limit);
-//
-//        List<CommentQuestionResponseDto> answerWait =  new ArrayList<>();
-//
-//        for(CommentReadQuestionQueryResult result : comments){
-//            Article article = articleRepository.findByArticleId(result.articleId()).orElseThrow(() -> new NotFoundException("Article", result.articleId()));
-//            Member member = memberJpaRepository.findById(result.writerId()).orElseThrow(() -> new NotFoundException("Member", result.writerId()));
-//            String writerImageUrl = "";
-//            if(!member.getProfileImgUrl().equals("")){
-//                writerImageUrl = getS3Url(member.getProfileImgUrl()).preSignedUrl();
-//            }
-//
-//            CommentQuestionResponseDto dto = CommentQuestionResponseDto.from(result,member.getNickname(),writerImageUrl,article);
-//            answerWait.add(dto);
-//        }
-//
-//        MyPageQuestionResponseDto responseDto = new MyPageQuestionResponseDto(answerWait, null);
-//
-//        return responseDto;
-//        // 답변 완료
-//    }
+    @Override
+    public UserAnswerTotalResponseDto readAllAnswers(Long lastArticleId, Long userId) {
+
+        List<UserAnswerResponseDto> userAnswerResponseDtos = new ArrayList<>();
+
+        List<ArticleReadAnswerQueryResult> answerArticles = lastArticleId == null?
+                articleRepository.findAllByWriterIdInfiniteScrollFromArticle(userId) :
+                articleRepository.findAllByWriterIdInfiniteScrollFromArticle(lastArticleId, userId);
+
+        for(ArticleReadAnswerQueryResult articles : answerArticles){
+            List<CommentReadAnswerQueryResult> answerComments  =
+                    commentRepository.findAllByArticleId(articles.articleId());
+
+            for(CommentReadAnswerQueryResult comments : answerComments){
+                if(comments.commentId().equals(comments.parentCommentId())){
+                    System.out.println(commentRepository.parentIdCountBy(comments.parentCommentId()));
+                    if(commentRepository.parentIdCountBy(comments.parentCommentId()) == 2){
+                        UserAnswerResponseDto dto = UserAnswerResponseDto.from(
+                                articles.articleId(), articles.title(), articles.locationAddress(),
+                                comments.createdAt(),
+                                comments.content(),
+                                true);
+                        userAnswerResponseDtos.add(dto);
+                    }else{
+                        UserAnswerResponseDto dto = UserAnswerResponseDto.from(
+                                articles.articleId(), articles.title(), articles.locationAddress(),
+                                comments.createdAt(),
+                                comments.content(),
+                                false);
+                        userAnswerResponseDtos.add(dto);
+                    }
+                }
+            }
+        }
+
+        return new UserAnswerTotalResponseDto(userAnswerResponseDtos.size(),userAnswerResponseDtos);
+    }
 
 
     private Location validateLocation(Long locationId) {

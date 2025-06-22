@@ -5,8 +5,7 @@ import com.idol.board.domain.SmallCategory;
 import com.idol.board.domain.entity.Article;
 import com.idol.board.dto.response.article.ArticleListResponseDto;
 import com.idol.board.repository.mapper.ArticleListReadQueryResult;
-import org.springframework.data.domain.Page;
-
+import com.idol.board.repository.mapper.ArticleReadAnswerQueryResult;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -23,4 +22,6 @@ public interface ArticleRepositoryCustom {
 
     List<ArticleListReadQueryResult> findJoinMyPageArticle(List<Long> articleIds, Long limit, Long offset);
 
+    List<ArticleReadAnswerQueryResult> findAllByWriterIdInfiniteScrollFromArticle(Long userId);
+    List<ArticleReadAnswerQueryResult> findAllByWriterIdInfiniteScrollFromArticle(Long lastArticleId,   Long userId);
 }

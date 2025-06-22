@@ -8,7 +8,9 @@ import com.idol.board.domain.entity.Article;
 import com.idol.board.domain.entity.QArticle;
 import com.idol.board.dto.response.article.ArticleListResponseDto;
 import com.idol.board.repository.mapper.ArticleListReadQueryResult;
+import com.idol.board.repository.mapper.ArticleReadAnswerQueryResult;
 import com.idol.board.repository.mapper.CommentReadQueryResult;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -122,6 +124,42 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
                     .limit(limit)
                     .offset(offset)
                     .fetch();
+    }
+
+    @Override
+    public List<ArticleReadAnswerQueryResult> findAllByWriterIdInfiniteScrollFromArticle( Long userId) {
+        return queryFactory
+                .select(Projections.constructor(ArticleReadAnswerQueryResult.class,
+                        article.articleId,
+                        article.title,
+                        article.locationAddress))
+                .from(article)
+                .where(
+                        article.isDeleted.eq(false),
+                        article.writerId.in(userId)
+                )
+                .fetch();
+    }
+
+    @Override
+    public List<ArticleReadAnswerQueryResult> findAllByWriterIdInfiniteScrollFromArticle(
+            Long lastArticleId,  Long userId) {
+        return queryFactory
+                .select(Projections.constructor(ArticleReadAnswerQueryResult.class,
+                        article.articleId,
+                        article.title,
+                        article.locationAddress))
+                .from(article)
+                .where(
+                        article.isDeleted.eq(false),
+                        article.writerId.in(userId),
+                        new BooleanBuilder()
+                                .or(article.articleId.eq(lastArticleId))
+                )
+                .orderBy(
+                        article.articleId.asc()
+                )
+                .fetch();
     }
 
     private BooleanExpression eqWriterId(Long userId) {
