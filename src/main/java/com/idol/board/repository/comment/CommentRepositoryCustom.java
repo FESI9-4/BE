@@ -1,6 +1,7 @@
 package com.idol.board.repository.comment;
 
 import com.idol.board.domain.entity.Comment;
+import com.idol.board.repository.mapper.CommentReadAnswerQueryResult;
 import com.idol.board.repository.mapper.CommentReadQueryResult;
 import com.idol.board.repository.mapper.CommentReadQuestionQueryResult;
 
@@ -19,7 +20,7 @@ public interface CommentRepositoryCustom {
 
     Optional<Comment> findByParentCommentId(Long parentCommentId);
 
+    List<CommentReadAnswerQueryResult> findAllByArticleId(Long articleId);
 
-//    List<CommentReadQuestionQueryResult> findQuestionAllInfiniteScroll(Long userId, Long limit);
-//    List<CommentReadQueryResult> findQuestionAllInfiniteScroll(Long userId, Long lastParentCommentId, Long lastCommentId, Long limit);
+    Long parentIdCountBy(Long parentCommentId);
 }

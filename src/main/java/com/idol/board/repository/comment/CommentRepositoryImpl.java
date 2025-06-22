@@ -2,6 +2,7 @@ package com.idol.board.repository.comment;
 
 import com.idol.board.domain.entity.Comment;
 import com.idol.board.domain.entity.QComment;
+import com.idol.board.repository.mapper.CommentReadAnswerQueryResult;
 import com.idol.board.repository.mapper.CommentReadQueryResult;
 import com.idol.board.repository.mapper.CommentReadQuestionQueryResult;
 import com.querydsl.core.BooleanBuilder;
@@ -136,44 +137,38 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
     }
 
 
-//    @Override
-//    public List<CommentReadQuestionQueryResult> findQuestionAllInfiniteScroll(Long userId, Long limit) {
-//
-//        return queryFactory
-//                .select(Projections.constructor(CommentReadQuestionQueryResult.class,
-//                        comment.commentId,
-//                        comment.articleId,
-//                        comment.content,
-//                        comment.parentCommentId,
-//                        comment.writerId,
-//                        comment.isDeleted,
-//                        comment.createdAt,
-//                        comment.secret))
-//                .from(comment)
-//                .where(
-//                        comment.isDeleted.eq(false),
-//                        comment.writerId.eq(userId).and(comment.parentCheck.eq(true))  // 부모 댓글
-//                                .or(
-//                                        comment.parentCommentId.in(
-//                                                JPAExpressions
-//                                                        .select(comment.commentId)
-//                                                        .from(comment)
-//                                                        .where(
-//                                                                comment.isDeleted.eq(false),
-//                                                                comment.writerId.eq(userId),
-//                                                                comment.parentCheck.eq(true)
-//                                                        )
-//                                        )  // 자식 댓글
-//                                )
-//                )
-//                .orderBy(
-//                        comment.parentCommentId.asc().nullsFirst(),  // 부모 댓글 먼저
-//                        comment.parentCheck.desc(),                  // 부모 댓글 먼저
-//                        comment.createdAt.asc()
-//                )
-////                .limit(limit * 10)
-////                .offset(offset)
-//                .fetch();
-//    }
 
+    @Override
+    public List<CommentReadAnswerQueryResult> findAllByArticleId(Long articleId) {
+
+        return queryFactory
+                .select(Projections.constructor(CommentReadAnswerQueryResult.class,
+                        comment.content,
+                        comment.createdAt,
+                        comment.commentId,
+                        comment.parentCommentId))
+                .from(comment)
+                .where(
+                        comment.isDeleted.eq(false),
+                        comment.articleId.eq(articleId)
+                )
+                .orderBy(
+                        comment.parentCommentId.asc(),
+                        comment.commentId.asc()
+                )
+                .fetch();
+    }
+
+
+    @Override
+    public Long parentIdCountBy(Long parentCommentId) {
+        return queryFactory
+                .select(comment.count())
+                .from(comment)
+                .where(
+                        comment.isDeleted.eq(false),
+                        comment.parentCommentId.eq(parentCommentId)
+                )
+                .fetchOne();
+    }
 }

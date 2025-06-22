@@ -34,8 +34,6 @@ public class Comment extends BaseEntity {
     @Column(name = "secret", nullable = false)
     private boolean secret;
 
-//    @Column(name = "parent_check")
-//    private boolean parentCheck;
 
     @Builder
     public Comment(Long commentId, Long articleId, Long writerId, String content, Long parentCommentId, boolean secret) {
