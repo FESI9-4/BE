@@ -64,6 +64,7 @@ public class Member extends BaseEntity {
 
 
     public void update(MyPageUpdateRequestDto dto, String encryptedPassword) {
+        if(dto.email()  != null ) this.email = dto.email();
         if(dto.nickName() != null) this.nickname = dto.nickName();
         if(dto.information() != null) this.information = dto.information();
         if(dto.profileImgUrl() != null) this.profileImgUrl = dto.profileImgUrl();
