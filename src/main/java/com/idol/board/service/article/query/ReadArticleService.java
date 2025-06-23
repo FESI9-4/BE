@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional()
+@Transactional
 public class ReadArticleService implements ReadArticleUseCase {
 
     private final ArticleRepository articleRepository;
@@ -44,7 +44,7 @@ public class ReadArticleService implements ReadArticleUseCase {
     private final WishRepository wishRepository;
 
     @Override
-    @Transactional(readOnly = true)
+
     public ArticleReadResponseDto readArticle(Long articleId, Long userId) {
         Article article = articleRepository.findByArticleId(articleId)
                 .orElseThrow(() -> new NotFoundException("Article", articleId));
@@ -94,7 +94,6 @@ public class ReadArticleService implements ReadArticleUseCase {
 
 
     @Override
-    @Transactional(readOnly = true)
     public List<ArticleListImgResponseDto> searchArticleList(
             BigCategory bigCategory, SmallCategory smallCategory, String location,
             Long date, String sort, boolean sortAsc, Long limit, Long page, Long memberId) {
@@ -127,7 +126,9 @@ public class ReadArticleService implements ReadArticleUseCase {
 
     private void validateCheckOpenStatus(Article article) {
         if(article.getCurrentPerson() >= article.getMinPerson()){
-            article.updateOpenStatus(OpenStatus.CONFIRMED_STATUS);
+            if(article.getOpenStatus().equals(OpenStatus.PENDING_STATUS)) {
+                article.updateOpenStatus(OpenStatus.CONFIRMED_STATUS);
+            }
         }
     }
 
@@ -140,7 +141,7 @@ public class ReadArticleService implements ReadArticleUseCase {
             if(status.equals(OpenStatus.CONFIRMED_STATUS)) {
                 article.updateOpenStatus(OpenStatus.DEADLINE_STATUS);
                 return OpenStatus.DEADLINE_STATUS;
-            }else{
+            }else if(status.equals(OpenStatus.PENDING_STATUS)){
                 article.updateOpenStatus(OpenStatus.CANCELED_STATUS);
                 return OpenStatus.CANCELED_STATUS;
             }
