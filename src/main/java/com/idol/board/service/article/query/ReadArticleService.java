@@ -6,6 +6,7 @@ import com.idol.board.domain.SmallCategory;
 import com.idol.board.domain.entity.Article;
 import com.idol.board.domain.entity.Location;
 import com.idol.board.domain.entity.Participant;
+import com.idol.board.dto.response.article.ArticleListImgResponseDto;
 import com.idol.board.dto.response.article.ArticleListResponseDto;
 import com.idol.board.dto.response.article.ArticleReadResponseDto;
 import com.idol.board.dto.response.participant.ParticipantResponseDto;
@@ -89,7 +90,7 @@ public class ReadArticleService implements ReadArticleUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ArticleListResponseDto> searchArticleList(
+    public List<ArticleListImgResponseDto> searchArticleList(
             BigCategory bigCategory, SmallCategory smallCategory, String location,
             Long date, String sort, boolean sortAsc, Long limit, Long page) {
 
@@ -98,16 +99,20 @@ public class ReadArticleService implements ReadArticleUseCase {
             dateTime =  new Timestamp(date * 1000);
         }
 
-        List<ArticleListResponseDto> searchArticles = articleRepository.findArticleList(
+        List<ArticleListImgResponseDto> searchArticles = articleRepository.findArticleList(
                 bigCategory, smallCategory, location, dateTime, sort,  sortAsc, limit,  (page -1) * limit).stream()
                 .map(result ->
-                        ArticleListResponseDto.from(
+                        ArticleListImgResponseDto.from(
                                 result,
                                 validateLocation(result.locationId()).getRoadNameAddress(),
-                                result.imageKey().equals("")? "" : getS3Url(result.imageKey()).preSignedUrl()
+                                result.imageKey().equals("")? "" : getS3Url(result.imageKey()).preSignedUrl(),
+                                validateUser(result.writerId()).getNickname(),
+                                validateUser(result.writerId()).getProfileImgUrl()
 //                                getS3Url(result.imageKey()).preSignedUrl()
                         ))
                 .collect(Collectors.toList());
+
+
 
         return searchArticles;
     }
@@ -127,5 +132,12 @@ public class ReadArticleService implements ReadArticleUseCase {
 
     private GetS3UrlDto getS3Url(String imageKey){
         return imageGetUserCase.getGetS3Url(imageKey);
+    }
+
+    private Member validateUser(Long userId) {
+        Member memerEntity = memberJpaRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Member", userId));
+
+        return memerEntity;
     }
 }

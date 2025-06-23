@@ -2,6 +2,7 @@ package com.idol.board.controller.article.query;
 
 import com.idol.board.domain.BigCategory;
 import com.idol.board.domain.SmallCategory;
+import com.idol.board.dto.response.article.ArticleListImgResponseDto;
 import com.idol.board.dto.response.article.ArticleListResponseDto;
 import com.idol.board.dto.response.article.ArticleReadResponseDto;
 import com.idol.board.dto.response.comment.CommentResponseDto;
@@ -36,7 +37,7 @@ public class GetArticleController {
     @Operation(summary = "게시글 리스트 출력", description = "카테고리, 지역, 날짜, 정렬 기준으로 게시글 리스트 출력")
     // /bigCategory?=go&smallCategory?=lentBus&location?=”seoul”&date?=1747361368&sort?=recent&sortAsc=true&lastArticleId?=151381421513&limit?=10
     @GetMapping()
-    public ApiResponse<List<ArticleListResponseDto>> readAllArticle(
+    public ApiResponse<List<ArticleListImgResponseDto>> readAllArticle(
             @RequestParam(value = "bigCategory", required=false)BigCategory bigCategory,
             @RequestParam(value = "smallCategory", required=false)SmallCategory smallCategory,
             @RequestParam(value = "location", required=false)String location,
@@ -47,7 +48,7 @@ public class GetArticleController {
             @RequestParam(value = "page")Long page
             ){
 
-        List<ArticleListResponseDto> dto = readArticleUseCase.searchArticleList(bigCategory, smallCategory, location, date, sort,  sortAsc,limit,  page);
+        List<ArticleListImgResponseDto> dto = readArticleUseCase.searchArticleList(bigCategory, smallCategory, location, date, sort,  sortAsc,limit,  page);
 
         return  ApiResponse.ok(dto, "게시글 리스트 전체 조회 성공");
     }
