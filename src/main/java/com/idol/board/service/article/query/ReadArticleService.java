@@ -44,7 +44,7 @@ public class ReadArticleService implements ReadArticleUseCase {
     private final WishRepository wishRepository;
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional()
     public ArticleReadResponseDto readArticle(Long articleId, Long userId) {
         Article article = articleRepository.findByArticleId(articleId)
                 .orElseThrow(() -> new NotFoundException("Article", articleId));
@@ -94,7 +94,7 @@ public class ReadArticleService implements ReadArticleUseCase {
 
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional()
     public List<ArticleListImgResponseDto> searchArticleList(
             BigCategory bigCategory, SmallCategory smallCategory, String location,
             Long date, String sort, boolean sortAsc, Long limit, Long page, Long memberId) {
@@ -129,9 +129,11 @@ public class ReadArticleService implements ReadArticleUseCase {
         if(article.getCurrentPerson() >= article.getMinPerson()){
             if(article.getOpenStatus().equals(OpenStatus.PENDING_STATUS)) {
                 article.updateOpenStatus(OpenStatus.CONFIRMED_STATUS);
+                articleRepository.save(article);
             }
         }
     }
+
 
     private OpenStatus validateCheckDeadlineStatus(Long articleId, OpenStatus status, Date deadline) {
         Article article = articleRepository.findByArticleId(articleId)
@@ -141,9 +143,11 @@ public class ReadArticleService implements ReadArticleUseCase {
         if(deadlineTime.before(new Timestamp(System.currentTimeMillis()))){
             if(status.equals(OpenStatus.CONFIRMED_STATUS)) {
                 article.updateOpenStatus(OpenStatus.DEADLINE_STATUS);
+                articleRepository.save(article);
                 return OpenStatus.DEADLINE_STATUS;
             }else if(status.equals(OpenStatus.PENDING_STATUS)){
                 article.updateOpenStatus(OpenStatus.CANCELED_STATUS);
+                articleRepository.save(article);
                 return OpenStatus.CANCELED_STATUS;
             }
         }
