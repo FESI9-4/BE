@@ -19,7 +19,6 @@ public class ArticleStatusService {
     private final ArticleRepository articleRepository;
     private final EntityManager entityManager;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void validateCheckOpenStatus(Article article) {
         if(article.getCurrentPerson() >= article.getMinPerson()){
             if(article.getOpenStatus().equals(OpenStatus.PENDING_STATUS)) {
@@ -28,8 +27,6 @@ public class ArticleStatusService {
         }
     }
 
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public OpenStatus validateCheckDeadlineStatus(Long articleId, OpenStatus status, Date deadline) {
         Article article = articleRepository.findByArticleId(articleId)
                 .orElseThrow(() -> new NotFoundException("Article", articleId));
