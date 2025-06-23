@@ -37,7 +37,7 @@ public record ArticleListImgResponseDto(
     }
 
 
-    public static ArticleListImgResponseDto from(ArticleImgListReadQueryResult searchArticle, String location, String imageUrl, String nickName, String writerImageUrl) {
+    public static ArticleListImgResponseDto from(ArticleImgListReadQueryResult searchArticle, String location, OpenStatus status, boolean wish,String imageUrl, String nickName, String writerImageUrl) {
         return ArticleListImgResponseDto.builder()
                 .articleId(searchArticle.articleId())
                 .title(searchArticle.title())
@@ -47,8 +47,8 @@ public record ArticleListImgResponseDto(
                 .createAt(changeToUnixTime(Timestamp.valueOf(searchArticle.createAt())))
                 .currentPerson(searchArticle.currentPerson())
                 .maxPerson(searchArticle.maxPerson())
-                .openStatus(searchArticle.openStatus())
-                .wish(true)             // TODO :: Wish 연동되면 설정 추가
+                .openStatus(status)
+                .wish(wish)             // TODO :: Wish 연동되면 설정 추가
                 .image(imageUrl)
                 .useStatus(searchArticle.useStatus())
                 .nickName(nickName)

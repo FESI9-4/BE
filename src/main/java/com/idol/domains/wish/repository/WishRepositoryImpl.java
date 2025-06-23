@@ -55,4 +55,22 @@ public class WishRepositoryImpl implements WishRepository {
     public Long countByMemberIdAndIsDeletedFalse(Long memberId) {
         return wishJpaRepository.countByMemberIdAndIsDeletedFalse(memberId);
     }
+
+    @Override
+    public boolean findByArticleId(Long articleId, Long userId) {
+        QWish wish = QWish.wish;
+
+        Integer fetchOne = queryFactory
+                .selectOne()
+                .from(wish)
+                .where(
+                        wish.memberId.eq(userId),
+                        wish.articleId.eq(articleId)
+                )
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+
 }

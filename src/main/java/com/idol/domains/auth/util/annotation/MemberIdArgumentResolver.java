@@ -45,7 +45,7 @@ public class MemberIdArgumentResolver implements HandlerMethodArgumentResolver {
                 return principal.getMemberIdAsString();
             }
         }
-
-        throw new AuthenticationException(INVALID_PRINCIPAL_TYPE);
+        return null; // 인증 객체가 이상하면 null 반환
+//        throw new AuthenticationException(INVALID_PRINCIPAL_TYPE);
     }
 }
