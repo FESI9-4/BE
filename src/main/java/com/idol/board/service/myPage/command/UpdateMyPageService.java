@@ -8,9 +8,11 @@ import com.idol.global.exception.NotFoundException;
 import com.idol.global.util.PasswordEncryptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UpdateMyPageService implements UpdateMyPageUseCase {
 
     private final MemberJpaRepository memberJpaRepository;
@@ -21,8 +23,11 @@ public class UpdateMyPageService implements UpdateMyPageUseCase {
     public Long updateProfile(MyPageUpdateRequestDto dto, Long userId) {
         Member member = memberJpaRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Member", userId));
+        String encryptedPassword = null;
 
-        String encryptedPassword = passwordEncryptor.encrypt(dto.password());
+        if(dto.password() != null){
+            encryptedPassword = passwordEncryptor.encrypt(dto.password());
+        }
 
         member.update(dto, encryptedPassword);
 

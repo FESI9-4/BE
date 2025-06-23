@@ -127,7 +127,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
     }
 
     @Override
-    public List<ArticleReadAnswerQueryResult> findAllByWriterIdInfiniteScrollFromArticle( Long userId) {
+    public List<ArticleReadAnswerQueryResult> findAllByWriterIdInfiniteScrollFromArticle( Long userId, Long limit) {
         return queryFactory
                 .select(Projections.constructor(ArticleReadAnswerQueryResult.class,
                         article.articleId,
@@ -138,12 +138,13 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
                         article.isDeleted.eq(false),
                         article.writerId.in(userId)
                 )
+                .limit(limit)
                 .fetch();
     }
 
     @Override
     public List<ArticleReadAnswerQueryResult> findAllByWriterIdInfiniteScrollFromArticle(
-            Long lastArticleId,  Long userId) {
+            Long lastArticleId,  Long userId, Long limit) {
         return queryFactory
                 .select(Projections.constructor(ArticleReadAnswerQueryResult.class,
                         article.articleId,
@@ -154,11 +155,12 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
                         article.isDeleted.eq(false),
                         article.writerId.in(userId),
                         new BooleanBuilder()
-                                .or(article.articleId.eq(lastArticleId))
+                                .or(article.articleId.gt(lastArticleId))
                 )
                 .orderBy(
                         article.articleId.asc()
                 )
+                .limit(limit)
                 .fetch();
     }
 

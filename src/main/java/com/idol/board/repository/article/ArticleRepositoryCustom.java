@@ -22,6 +22,6 @@ public interface ArticleRepositoryCustom {
 
     List<ArticleListReadQueryResult> findJoinMyPageArticle(List<Long> articleIds, Long limit, Long offset);
 
-    List<ArticleReadAnswerQueryResult> findAllByWriterIdInfiniteScrollFromArticle(Long userId);
-    List<ArticleReadAnswerQueryResult> findAllByWriterIdInfiniteScrollFromArticle(Long lastArticleId,   Long userId);
+    List<ArticleReadAnswerQueryResult> findAllByWriterIdInfiniteScrollFromArticle(Long userId, Long limit);
+    List<ArticleReadAnswerQueryResult> findAllByWriterIdInfiniteScrollFromArticle(Long lastArticleId,   Long userId, Long limit);
 }

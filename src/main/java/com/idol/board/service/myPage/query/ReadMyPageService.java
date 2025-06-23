@@ -47,7 +47,7 @@ public class ReadMyPageService implements ReadMyPageUseCase {
     private final CountWishUsecase countWishUsecase;
 
     @Override
-    public List<ArticleListResponseDto> readMypageList(Long limit, Long page, Long userId) {
+    public UserAnswerTotalResponseDto readMypageList(Long limit, Long page, Long userId) {
         List<ArticleListResponseDto> searchMyPageList = articleRepository.findMyPageArticle(userId, limit, (page -1) * limit)
                 .stream().map(result ->
                         ArticleListResponseDto.from(
@@ -57,12 +57,12 @@ public class ReadMyPageService implements ReadMyPageUseCase {
                         ))
                 .collect(Collectors.toList());
 
-        return searchMyPageList;
+        return new UserAnswerTotalResponseDto(searchMyPageList.size(), searchMyPageList);
     }
 
 
     @Override
-    public List<ArticleListResponseDto> readJoinMypageList(Long limit, Long page, Long userId) {
+    public UserAnswerTotalResponseDto readJoinMypageList(Long limit, Long page, Long userId) {
         List<Participant> participants = participantRepository.findParticipantFromWriterId(userId);
 
         List<Long> articleIds = participants.stream().map(Participant::getArticleId).collect(Collectors.toList());
@@ -77,7 +77,8 @@ public class ReadMyPageService implements ReadMyPageUseCase {
                         ))
                 .collect(Collectors.toList());
 
-        return searchMyPageList;
+
+        return new UserAnswerTotalResponseDto(searchMyPageList.size(), searchMyPageList);
     }
 
     @Override
@@ -96,13 +97,13 @@ public class ReadMyPageService implements ReadMyPageUseCase {
     }
 
     @Override
-    public UserAnswerTotalResponseDto readAllAnswers(Long lastArticleId, Long userId) {
+    public UserAnswerTotalResponseDto readAllAnswers(Long lastArticleId, Long userId, Long limit) {
 
         List<UserAnswerResponseDto> userAnswerResponseDtos = new ArrayList<>();
 
         List<ArticleReadAnswerQueryResult> answerArticles = lastArticleId == null?
-                articleRepository.findAllByWriterIdInfiniteScrollFromArticle(userId) :
-                articleRepository.findAllByWriterIdInfiniteScrollFromArticle(lastArticleId, userId);
+                articleRepository.findAllByWriterIdInfiniteScrollFromArticle(userId, limit) :
+                articleRepository.findAllByWriterIdInfiniteScrollFromArticle(lastArticleId, userId, limit);
 
         for(ArticleReadAnswerQueryResult articles : answerArticles){
             List<CommentReadAnswerQueryResult> answerComments  =

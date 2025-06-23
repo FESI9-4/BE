@@ -19,7 +19,7 @@ public class UpdateCommentService implements UpdateCommentUseCase {
     private final CommentRepository commentRepository;
 
     @Override
-    public Long updateComment(CommentUpdateRequestDto commentUpdateRequestDto, Long writerId) {
+    public Long updateComment(CommentUpdateRequestDto commentUpdateRequestDto,  Long writerId) {
         Comment comment = commentRepository.findByCommentId(commentUpdateRequestDto.commentId())
                 .orElseThrow(() -> new NotFoundException("Comment", commentUpdateRequestDto.commentId()));
 
@@ -31,7 +31,7 @@ public class UpdateCommentService implements UpdateCommentUseCase {
     }
 
     private void validateUserHasPermission(Comment comment, Long writerId) {
-        if (Long.compare(comment.getWriterId(), writerId) == 0) {
+        if (comment.getWriterId() !=  writerId) {
             throw new IllegalArgumentException("Comment",comment.getCommentId());
         }
     }

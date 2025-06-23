@@ -9,12 +9,12 @@ import com.idol.board.dto.response.mypage.UserDataResponseDto;
 import java.util.List;
 
 public interface ReadMyPageUseCase {
-    List<ArticleListResponseDto> readMypageList(Long limit, Long page, Long userId);
+    UserAnswerTotalResponseDto readMypageList(Long limit, Long page, Long userId);
 
-    List<ArticleListResponseDto> readJoinMypageList(Long limit, Long page, Long userId);
+    UserAnswerTotalResponseDto readJoinMypageList(Long limit, Long page, Long userId);
 
     UserDataResponseDto readUserInformation(Long userId);
 
     UserAnswerTotalResponseDto readAllAnswers(
-            Long lastArticleId, Long userId);
+            Long lastArticleId, Long userId, Long limit);
 }

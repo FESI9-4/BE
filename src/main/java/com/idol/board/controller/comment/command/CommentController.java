@@ -39,8 +39,8 @@ public class CommentController {
     @Operation(summary = "댓글 수정", description = "댓글 수정")
     @PatchMapping("/{articleId}/comment")
     public ApiResponse<Long>  updateComment(@PathVariable Long articleId, @RequestBody CommentUpdateRequestDto requestDto, @MemberId Long writerId) {
-        Long commentId = updateCommentUseCase.updateComment(requestDto,writerId);
+        Long returnCommentId = updateCommentUseCase.updateComment(requestDto,writerId);
 
-        return ApiResponse.ok(commentId, "댓글 생성 성공");
+        return ApiResponse.ok(returnCommentId, "댓글 수정 성공");
     }
 }

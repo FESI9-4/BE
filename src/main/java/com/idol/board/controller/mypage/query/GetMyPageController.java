@@ -31,13 +31,13 @@ public class GetMyPageController {
 
     @Operation(summary = "나의 펜팔 출력", description = "나의 펜팔 출력")
     @GetMapping()
-    public ApiResponse<List<ArticleListResponseDto>> readAllJoinMyPage(
+    public ApiResponse<UserAnswerTotalResponseDto> readAllJoinMyPage(
             @RequestParam(value = "limit")Long limit,
             @RequestParam(value = "page")Long page,
             @MemberId Long userId
     ){
 
-        List<ArticleListResponseDto> dto = readMypageUseCase.readJoinMypageList(limit,page,userId);
+        UserAnswerTotalResponseDto dto = readMypageUseCase.readJoinMypageList(limit,page,userId);
 
         return  ApiResponse.ok(dto, "나의 펜팔 리스트 조회 성공");
     }
@@ -45,13 +45,13 @@ public class GetMyPageController {
 
     @Operation(summary = "내가 만든 펜팔 출력", description = "내가 만든 펜팔 출력")
     @GetMapping("/self")
-    public ApiResponse<List<ArticleListResponseDto>> readAllCreateMyPage(
+    public ApiResponse<UserAnswerTotalResponseDto> readAllCreateMyPage(
             @RequestParam(value = "limit")Long limit,
             @RequestParam(value = "page")Long page,
             @MemberId Long userId
     ){
 
-        List<ArticleListResponseDto> dto = readMypageUseCase.readMypageList(limit,page,userId);
+        UserAnswerTotalResponseDto dto = readMypageUseCase.readMypageList(limit,page,userId);
 
         return  ApiResponse.ok(dto, "나가 만든 펜팔 리스트 조회 성공");
     }
@@ -70,9 +70,10 @@ public class GetMyPageController {
     @GetMapping("/answer")
     public ApiResponse<UserAnswerTotalResponseDto> readAllAnswers(
             @RequestParam(value = "lastArticleId", required = false) Long lastArticleId,
+            @RequestParam(value = "limit")Long limit,
             @MemberId Long userId
     ) {
-        UserAnswerTotalResponseDto response= readMypageUseCase.readAllAnswers(lastArticleId,userId);
+        UserAnswerTotalResponseDto response= readMypageUseCase.readAllAnswers(lastArticleId,userId, limit);
         return ApiResponse.ok(response, "나의 답변 리스트 출력 성공");
     }
 }
