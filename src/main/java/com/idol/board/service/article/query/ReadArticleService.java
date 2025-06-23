@@ -44,7 +44,7 @@ public class ReadArticleService implements ReadArticleUseCase {
     private final WishRepository wishRepository;
 
     @Override
-
+    @Transactional(readOnly = true)
     public ArticleReadResponseDto readArticle(Long articleId, Long userId) {
         Article article = articleRepository.findByArticleId(articleId)
                 .orElseThrow(() -> new NotFoundException("Article", articleId));
@@ -94,6 +94,7 @@ public class ReadArticleService implements ReadArticleUseCase {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<ArticleListImgResponseDto> searchArticleList(
             BigCategory bigCategory, SmallCategory smallCategory, String location,
             Long date, String sort, boolean sortAsc, Long limit, Long page, Long memberId) {
