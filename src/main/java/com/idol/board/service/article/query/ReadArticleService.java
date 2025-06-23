@@ -17,6 +17,7 @@ import com.idol.board.repository.mapper.ArticleListReadQueryResult;
 import com.idol.board.usecase.article.query.ReadArticleUseCase;
 import com.idol.domains.member.domain.Member;
 import com.idol.domains.member.repository.MemberJpaRepository;
+import com.idol.domains.wish.repository.WishRepository;
 import com.idol.global.exception.NotFoundException;
 import com.idol.imageUpload.dto.GetS3UrlDto;
 import com.idol.imageUpload.useCase.ImageGetUserCase;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,10 +41,11 @@ public class ReadArticleService implements ReadArticleUseCase {
     private final ImageGetUserCase imageGetUserCase;
     private final MemberJpaRepository memberJpaRepository;
     private final ParticipantRepository participantRepository;
+    private final WishRepository wishRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public ArticleReadResponseDto readArticle(Long articleId) {
+    public ArticleReadResponseDto readArticle(Long articleId, Long userId) {
         Article article = articleRepository.findByArticleId(articleId)
                 .orElseThrow(() -> new NotFoundException("Article", articleId));
 
@@ -82,7 +85,9 @@ public class ReadArticleService implements ReadArticleUseCase {
 
         validateCheckOpenStatus(article);
 
-        ArticleReadResponseDto dto = ArticleReadResponseDto.from(article,location,participants,true,articleImageUrl,member.getNickname(),writerImageUrl);
+        boolean wish = wishCheck(articleId,userId);
+
+        ArticleReadResponseDto dto = ArticleReadResponseDto.from(article,location,participants,wish,articleImageUrl,member.getNickname(),writerImageUrl);
 
         return dto;
     }
@@ -92,7 +97,7 @@ public class ReadArticleService implements ReadArticleUseCase {
     @Transactional(readOnly = true)
     public List<ArticleListImgResponseDto> searchArticleList(
             BigCategory bigCategory, SmallCategory smallCategory, String location,
-            Long date, String sort, boolean sortAsc, Long limit, Long page) {
+            Long date, String sort, boolean sortAsc, Long limit, Long page, Long memberId) {
 
         Timestamp dateTime = null;
         if (date != null) {
@@ -105,10 +110,11 @@ public class ReadArticleService implements ReadArticleUseCase {
                         ArticleListImgResponseDto.from(
                                 result,
                                 validateLocation(result.locationId()).getRoadNameAddress(),
+                                validateCheckDeadlineStatus(result.articleId(), result.openStatus(), result.deadLine()),
+                                wishCheck(result.articleId(), memberId),
                                 result.imageKey().equals("")? "" : getS3Url(result.imageKey()).preSignedUrl(),
                                 validateUser(result.writerId()).getNickname(),
                                 validateUser(result.writerId()).getProfileImgUrl()
-//                                getS3Url(result.imageKey()).preSignedUrl()
                         ))
                 .collect(Collectors.toList());
 
@@ -125,6 +131,23 @@ public class ReadArticleService implements ReadArticleUseCase {
         }
     }
 
+    private OpenStatus validateCheckDeadlineStatus(Long articleId, OpenStatus status, Date deadline) {
+        Article article = articleRepository.findByArticleId(articleId)
+                .orElseThrow(() -> new NotFoundException("Article", articleId));
+
+        Timestamp deadlineTime = new Timestamp(deadline.getTime());
+        if(deadlineTime.before(new Timestamp(System.currentTimeMillis()))){
+            if(status.equals(OpenStatus.CONFIRMED_STATUS)) {
+                article.updateOpenStatus(OpenStatus.DEADLINE_STATUS);
+                return OpenStatus.DEADLINE_STATUS;
+            }else{
+                article.updateOpenStatus(OpenStatus.CANCELED_STATUS);
+                return OpenStatus.CANCELED_STATUS;
+            }
+        }
+        return status;
+    }
+
     private Location validateLocation(Long locationId) {
         return locationRepository.findByLocationId(locationId)
                 .orElseThrow(() -> new NotFoundException("Location", locationId));
@@ -139,5 +162,17 @@ public class ReadArticleService implements ReadArticleUseCase {
                 .orElseThrow(() -> new NotFoundException("Member", userId));
 
         return memerEntity;
+    }
+
+    private boolean wishCheck(Long articleId, Long memberId){
+        if(memberId == null){
+            return false;
+        }else{
+            if(wishRepository.findByArticleId(articleId, memberId)){
+                return true;
+            }else {
+                return false;
+            }
+        }
     }
 }

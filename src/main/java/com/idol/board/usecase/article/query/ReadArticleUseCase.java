@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public interface ReadArticleUseCase {
-    ArticleReadResponseDto readArticle(Long articleId);
+    ArticleReadResponseDto readArticle(Long articleId, Long userId);
 
-    List<ArticleListImgResponseDto> searchArticleList(BigCategory bigCategory, SmallCategory smallCategory, String location, Long date, String sort, boolean sortAsc, Long limit, Long page);
+    List<ArticleListImgResponseDto> searchArticleList(BigCategory bigCategory, SmallCategory smallCategory, String location, Long date, String sort, boolean sortAsc, Long limit, Long page, Long memberId);
 }

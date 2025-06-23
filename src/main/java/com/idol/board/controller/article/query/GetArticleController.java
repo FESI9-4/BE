@@ -8,9 +8,11 @@ import com.idol.board.dto.response.article.ArticleReadResponseDto;
 import com.idol.board.dto.response.comment.CommentResponseDto;
 import com.idol.board.usecase.article.query.ReadArticleUseCase;
 import com.idol.board.usecase.comment.query.ReadCommentUseCase;
+import com.idol.domains.auth.util.annotation.MemberId;
 import com.idol.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,9 +28,9 @@ public class GetArticleController {
 
     @Operation(summary = "게시글 상세 페이지", description = "게시글 상세 페이지 출력")
     @GetMapping("/{articleId}")
-    public ApiResponse<ArticleReadResponseDto> readArticle(@PathVariable Long articleId) {
+    public ApiResponse<ArticleReadResponseDto> readArticle(@PathVariable Long articleId, @MemberId Long userId) {
 
-        ArticleReadResponseDto articleReadResponseDto = readArticleUseCase.readArticle(articleId);
+        ArticleReadResponseDto articleReadResponseDto = readArticleUseCase.readArticle(articleId,userId);
 
         return ApiResponse.ok(articleReadResponseDto, "상세 게시글 호출 성공");
     }
@@ -45,10 +47,11 @@ public class GetArticleController {
             @RequestParam(value = "sort", required=false)String sort,
             @RequestParam(value = "sortAsc", required=false)boolean sortAsc,                // true : ASC, false : DESC
             @RequestParam(value = "limit")Long limit,
-            @RequestParam(value = "page")Long page
+            @RequestParam(value = "page")Long page,
+            @MemberId Long memberId
             ){
 
-        List<ArticleListImgResponseDto> dto = readArticleUseCase.searchArticleList(bigCategory, smallCategory, location, date, sort,  sortAsc,limit,  page);
+        List<ArticleListImgResponseDto> dto = readArticleUseCase.searchArticleList(bigCategory, smallCategory, location, date, sort,  sortAsc,limit,  page,memberId);
 
         return  ApiResponse.ok(dto, "게시글 리스트 전체 조회 성공");
     }

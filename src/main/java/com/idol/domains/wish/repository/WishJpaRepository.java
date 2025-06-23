@@ -12,4 +12,6 @@ public interface WishJpaRepository extends JpaRepository<Wish, Long> {
     Long countByMemberIdAndIsDeletedFalse(Long memberId);
 
     void deleteByMemberIdAndArticleId(Long memberId, Long articleId);
+
+
 }

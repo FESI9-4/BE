@@ -13,4 +13,6 @@ public interface WishRepository {
     List<GetMembersWishListResponseDto> findByMemberId(Long memberId);
     List<Long> findArticleIdsByMemberId(Long memberId);
     Long countByMemberIdAndIsDeletedFalse(Long memberId);
+
+    boolean findByArticleId(Long articleId, Long userId);
 }
