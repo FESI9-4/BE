@@ -42,9 +42,10 @@ public class ReadArticleService implements ReadArticleUseCase {
     private final MemberJpaRepository memberJpaRepository;
     private final ParticipantRepository participantRepository;
     private final WishRepository wishRepository;
+    private final ArticleStatusService articleStatusService;
 
     @Override
-    @Transactional()
+    @Transactional(readOnly = true)
     public ArticleReadResponseDto readArticle(Long articleId, Long userId) {
         Article article = articleRepository.findByArticleId(articleId)
                 .orElseThrow(() -> new NotFoundException("Article", articleId));
@@ -83,7 +84,7 @@ public class ReadArticleService implements ReadArticleUseCase {
         Location location = validateLocation(article.getLocationId());
 
 
-        validateCheckOpenStatus(article);
+        articleStatusService.validateCheckOpenStatus(article);
 
         boolean wish = wishCheck(articleId,userId);
 
@@ -94,7 +95,7 @@ public class ReadArticleService implements ReadArticleUseCase {
 
 
     @Override
-    @Transactional()
+    @Transactional(readOnly = true)
     public List<ArticleListImgResponseDto> searchArticleList(
             BigCategory bigCategory, SmallCategory smallCategory, String location,
             Long date, String sort, boolean sortAsc, Long limit, Long page, Long memberId) {
@@ -110,7 +111,7 @@ public class ReadArticleService implements ReadArticleUseCase {
                         ArticleListImgResponseDto.from(
                                 result,
                                 validateLocation(result.locationId()).getRoadNameAddress(),
-                                validateCheckDeadlineStatus(result.articleId(), result.openStatus(), result.deadLine()),
+                                articleStatusService.validateCheckDeadlineStatus(result.articleId(), result.openStatus(), result.deadLine()),
                                 wishCheck(result.articleId(), memberId),
                                 result.imageKey().equals("")? "" : getS3Url(result.imageKey()).preSignedUrl(),
                                 validateUser(result.writerId()).getNickname(),
@@ -125,34 +126,10 @@ public class ReadArticleService implements ReadArticleUseCase {
 
 
 
-    private void validateCheckOpenStatus(Article article) {
-        if(article.getCurrentPerson() >= article.getMinPerson()){
-            if(article.getOpenStatus().equals(OpenStatus.PENDING_STATUS)) {
-                article.updateOpenStatus(OpenStatus.CONFIRMED_STATUS);
-                articleRepository.save(article);
-            }
-        }
-    }
 
 
-    private OpenStatus validateCheckDeadlineStatus(Long articleId, OpenStatus status, Date deadline) {
-        Article article = articleRepository.findByArticleId(articleId)
-                .orElseThrow(() -> new NotFoundException("Article", articleId));
 
-        Timestamp deadlineTime = new Timestamp(deadline.getTime());
-        if(deadlineTime.before(new Timestamp(System.currentTimeMillis()))){
-            if(status.equals(OpenStatus.CONFIRMED_STATUS)) {
-                article.updateOpenStatus(OpenStatus.DEADLINE_STATUS);
-                articleRepository.save(article);
-                return OpenStatus.DEADLINE_STATUS;
-            }else if(status.equals(OpenStatus.PENDING_STATUS)){
-                article.updateOpenStatus(OpenStatus.CANCELED_STATUS);
-                articleRepository.save(article);
-                return OpenStatus.CANCELED_STATUS;
-            }
-        }
-        return status;
-    }
+
 
     private Location validateLocation(Long locationId) {
         return locationRepository.findByLocationId(locationId)
