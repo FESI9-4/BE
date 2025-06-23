@@ -1,5 +1,6 @@
 package com.idol.board.controller.mypage.command;
 
+import com.idol.board.dto.request.myPage.MyPagePasswordUpdateRequestDto;
 import com.idol.board.dto.request.myPage.MyPageUpdateRequestDto;
 import com.idol.board.usecase.mypage.command.DeleteMyPageUseCase;
 import com.idol.board.usecase.mypage.command.UpdateMyPageUseCase;
@@ -29,6 +30,13 @@ public class MyPageController {
 
         Long memberId = updateMyPageUseCase.updateProfile(dto,userId);
         return ApiResponse.ok(memberId,"개인 정보 수정 완료");
+    }
+
+    @Operation(summary = "비밀번호 변경", description = "비밀 번호 변경")
+    @PutMapping()
+    public ApiResponse<Long> updatePassword(@Valid @RequestBody MyPagePasswordUpdateRequestDto dto, @MemberId Long userId){
+        Long memberId = updateMyPageUseCase.updatePassword(dto,userId);
+        return ApiResponse.ok(memberId,"비밀 번호 변경 완료");
     }
 
     @Operation(summary = "내가 참여한 펜팔 삭제", description = "내가 참여하나 펜팔 삭제")

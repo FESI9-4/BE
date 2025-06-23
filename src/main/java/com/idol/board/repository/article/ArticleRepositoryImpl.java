@@ -7,6 +7,7 @@ import com.idol.board.domain.UseStatus;
 import com.idol.board.domain.entity.Article;
 import com.idol.board.domain.entity.QArticle;
 import com.idol.board.dto.response.article.ArticleListResponseDto;
+import com.idol.board.repository.mapper.ArticleImgListReadQueryResult;
 import com.idol.board.repository.mapper.ArticleListReadQueryResult;
 import com.idol.board.repository.mapper.ArticleReadAnswerQueryResult;
 import com.idol.board.repository.mapper.CommentReadQueryResult;
@@ -46,9 +47,9 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
     }
 
     @Override
-    public List<ArticleListReadQueryResult> findArticleList(BigCategory bigCategory, SmallCategory smallCategory, String location, Timestamp date, String sort, boolean sortAsc, Long limit, Long offset) {
+    public List<ArticleImgListReadQueryResult> findArticleList(BigCategory bigCategory, SmallCategory smallCategory, String location, Timestamp date, String sort, boolean sortAsc, Long limit, Long offset) {
         return queryFactory
-                .select(Projections.constructor(ArticleListReadQueryResult.class,
+                .select(Projections.constructor(ArticleImgListReadQueryResult.class,
                         article.articleId,
                         article.title,
                         article.locationId,
@@ -59,7 +60,8 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
                         article.currentPerson,
                         article.maxPerson,
                         article.openStatus,
-                        article.useStatus))
+                        article.useStatus,
+                        article.writerId))
                 .from(article)
                 .where(
                         article.isDeleted.eq(false),

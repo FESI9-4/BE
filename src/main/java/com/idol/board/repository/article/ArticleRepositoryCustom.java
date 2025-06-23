@@ -4,6 +4,7 @@ import com.idol.board.domain.BigCategory;
 import com.idol.board.domain.SmallCategory;
 import com.idol.board.domain.entity.Article;
 import com.idol.board.dto.response.article.ArticleListResponseDto;
+import com.idol.board.repository.mapper.ArticleImgListReadQueryResult;
 import com.idol.board.repository.mapper.ArticleListReadQueryResult;
 import com.idol.board.repository.mapper.ArticleReadAnswerQueryResult;
 import java.sql.Timestamp;
@@ -14,7 +15,7 @@ import java.util.Optional;
 public interface ArticleRepositoryCustom {
     Optional<Article> findByArticleId(Long articleId);
 
-    List<ArticleListReadQueryResult> findArticleList(
+    List<ArticleImgListReadQueryResult> findArticleList(
             BigCategory bigCategory, SmallCategory smallCategory, String location,
             Timestamp date, String sort, boolean sortAsc, Long limit, Long offset);
 

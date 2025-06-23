@@ -5,7 +5,6 @@ public record MyPageUpdateRequestDto(
         String nickName,
         String email,
         String information,
-        String password,
         String profileImgUrl
 ) {
 }

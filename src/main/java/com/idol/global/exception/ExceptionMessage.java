@@ -24,6 +24,7 @@ public enum ExceptionMessage {
     EMAIL_ALREADY_EXISTS("이미 사용 중인 이메일입니다."),
     NICKNAME_ALREADY_EXISTS("이미 사용 중인 닉네임입니다."),
     INVALID_PASSWORD_FORMAT("비밀번호는 8자 이상, 영문/숫자/특수문자를 포함해야 합니다."),
+    INCORRECT_PASSWORD("기존 비밀번호가 틀립니다 다시 입력해주세요"),
 
     // 권한 관련
     ACCESS_DENIED("접근 권한이 없습니다."),
